@@ -1,5 +1,6 @@
 import {
   bigint,
+  bigserial,
   boolean,
   customType,
   date,
@@ -416,4 +417,256 @@ export const decisions = pgTable("decisions", {
   reason: text("reason"),
   decidedBy: integer("decided_by").references(() => users.id),
   decidedAt: opsTime("decided_at"),
+});
+
+/* ------------------------------------------------------------------ */
+/* Execution: dock, road, outlet                                       */
+/* ------------------------------------------------------------------ */
+
+export const tripRuns = pgTable(
+  "trip_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    day: date("day", { mode: "string" }).notNull(),
+    planTripId: uuid("plan_trip_id").references(() => planTrips.id, {
+      onDelete: "set null",
+    }),
+    planVersion: integer("plan_version").notNull(),
+    vehicleId: text("vehicle_id")
+      .notNull()
+      .references(() => vehicles.id),
+    tripNo: integer("trip_no").notNull(),
+    brand: brandEnum("brand").notNull(),
+    district: text("district").notNull(),
+    depot: text("depot").notNull(),
+    depart: integer("depart").notNull(),
+    returnAt: integer("return_at").notNull(),
+    status: tripStatusEnum("status").notNull().default("planned"),
+    driverId: integer("driver_id").references(() => users.id),
+    dock: integer("dock").notNull().default(1),
+    handoverCode: text("handover_code"),
+    handoverToken: text("handover_token"),
+    seal: text("seal"),
+    reeferTempC: doublePrecision("reefer_temp_c"),
+    loadingStartedAt: opsTime("loading_started_at"),
+    releasedAt: opsTime("released_at"),
+    releasedBy: integer("released_by").references(() => users.id),
+    acceptedAt: opsTime("accepted_at"),
+    departedAt: opsTime("departed_at"),
+    completedAt: opsTime("completed_at"),
+    lastHeardAt: opsTime("last_heard_at"),
+    /** Last position the driver's phone reported, if location is allowed. */
+    lastLat: doublePrecision("last_lat"),
+    lastLng: doublePrecision("last_lng"),
+    /** What changed on this vehicle since the version the dock acknowledged. */
+    changeNote: text("change_note"),
+    changeAcked: boolean("change_acked").notNull().default(true),
+  },
+  (t) => [
+    uniqueIndex("trip_runs_slot_idx").on(t.day, t.vehicleId, t.tripNo),
+    index("trip_runs_day_idx").on(t.day),
+  ],
+);
+
+export const stopRuns = pgTable(
+  "stop_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tripRunId: uuid("trip_run_id")
+      .notNull()
+      .references(() => tripRuns.id, { onDelete: "cascade" }),
+    seq: integer("seq").notNull(),
+    outletId: text("outlet_id")
+      .notNull()
+      .references(() => outlets.id),
+    orderIds: jsonb("order_ids").$type<string[]>().notNull(),
+    eta: integer("eta").notNull(),
+    serviceMin: integer("service_min").notNull().default(15),
+    windowOpen: integer("window_open").notNull(),
+    windowClose: integer("window_close").notNull(),
+    status: stopStatusEnum("status").notNull().default("pending"),
+    arrivedAt: opsTime("arrived_at"),
+    completedAt: opsTime("completed_at"),
+    problem: text("problem"),
+    receiverName: text("receiver_name"),
+    tempC: doublePrecision("temp_c"),
+    photoId: uuid("photo_id"),
+    signatureId: uuid("signature_id"),
+    /** Counts handed over, per order. */
+    counts: jsonb("counts").$type<Record<string, number>>(),
+    recordedOffline: boolean("recorded_offline").notNull().default(false),
+    syncedAt: opsTime("synced_at"),
+  },
+  (t) => [index("stop_runs_trip_idx").on(t.tripRunId)],
+);
+
+export const loadUnits = pgTable(
+  "load_units",
+  {
+    id: text("id").notNull(), // CAGE-074-1
+    tripRunId: uuid("trip_run_id")
+      .notNull()
+      .references(() => tripRuns.id, { onDelete: "cascade" }),
+    orderId: text("order_id")
+      .notNull()
+      .references(() => orders.id),
+    orderLineId: integer("order_line_id").references(() => orderLines.id),
+    stopSeq: integer("stop_seq").notNull(),
+    kind: text("kind").notNull(), // cage | pallet | carton | item
+    name: text("name").notNull(),
+    cases: integer("cases").notNull(),
+    volumeM3: doublePrecision("volume_m3").notNull(),
+    temp: tempEnum("temp").notNull(),
+    status: unitStatusEnum("status").notNull().default("pending"),
+    loadedAt: opsTime("loaded_at"),
+    loadedBy: integer("loaded_by").references(() => users.id),
+  },
+  (t) => [primaryKey({ columns: [t.tripRunId, t.id] })],
+);
+
+export const shortfalls = pgTable("shortfalls", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tripRunId: uuid("trip_run_id")
+    .notNull()
+    .references(() => tripRuns.id, { onDelete: "cascade" }),
+  unitId: text("unit_id").notNull(),
+  orderId: text("order_id")
+    .notNull()
+    .references(() => orders.id),
+  orderLineId: integer("order_line_id").references(() => orderLines.id),
+  reason: text("reason").notNull(), // damaged | missing | wrong | warm
+  cases: integer("cases").notNull(),
+  note: text("note"),
+  photoId: uuid("photo_id"),
+  creditRef: text("credit_ref").notNull(),
+  recordedAt: opsTime("recorded_at").notNull(),
+  recordedBy: integer("recorded_by").references(() => users.id),
+});
+
+export const receipts = pgTable("receipts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: text("order_id")
+    .notNull()
+    .references(() => orders.id)
+    .unique(),
+  outletId: text("outlet_id")
+    .notNull()
+    .references(() => outlets.id),
+  confirmedAt: opsTime("confirmed_at").notNull(),
+  confirmedBy: integer("confirmed_by").references(() => users.id),
+  /** line id → cases counted at the outlet */
+  counts: jsonb("counts").$type<Record<string, number>>().notNull(),
+  expected: integer("expected").notNull(),
+  received: integer("received").notNull(),
+  note: text("note"),
+  photoId: uuid("photo_id"),
+});
+
+/** A difference between the driver's handover count and the store's count. */
+export const reconciliations = pgTable("reconciliations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: text("order_id")
+    .notNull()
+    .references(() => orders.id)
+    .unique(),
+  stopRunId: uuid("stop_run_id").references(() => stopRuns.id, {
+    onDelete: "cascade",
+  }),
+  driverCount: integer("driver_count").notNull(),
+  storeCount: integer("store_count").notNull(),
+  storeNote: text("store_note"),
+  status: text("status").notNull().default("open"),
+  resolution: text("resolution"), // after_handover | intact
+  resolvedAt: opsTime("resolved_at"),
+  resolvedBy: integer("resolved_by").references(() => users.id),
+  openedAt: opsTime("opened_at").notNull(),
+});
+
+export const messages = pgTable("messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tripRunId: uuid("trip_run_id")
+    .notNull()
+    .references(() => tripRuns.id, { onDelete: "cascade" }),
+  fromUser: integer("from_user").references(() => users.id),
+  text: text("text").notNull(),
+  sentAt: opsTime("sent_at").notNull(),
+});
+
+export const issues = pgTable("issues", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  outletId: text("outlet_id")
+    .notNull()
+    .references(() => outlets.id),
+  orderId: text("order_id").references(() => orders.id),
+  kind: text("kind").notNull(),
+  note: text("note"),
+  status: text("status").notNull().default("open"),
+  raisedAt: opsTime("raised_at").notNull(),
+  raisedBy: integer("raised_by").references(() => users.id),
+});
+
+/** What each person is told. Audience is an outlet, a user or a whole role. */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    audience: text("audience").notNull(), // outlet:OUT074 | user:12 | role:dispatcher
+    kind: text("kind").notNull(),
+    title: text("title").notNull(),
+    body: text("body"),
+    link: text("link"),
+    orderId: text("order_id"),
+    at: opsTime("at").notNull(),
+    readAt: opsTime("read_at"),
+    ackAt: opsTime("ack_at"),
+  },
+  (t) => [index("notifications_audience_idx").on(t.audience)],
+);
+
+/**
+ * The shared record. Append only: every handoff and decision from every
+ * role, with the story time it happened (from the device when offline) and
+ * the real time the server received it.
+ */
+export const events = pgTable(
+  "events",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    at: opsTime("at").notNull(),
+    kind: text("kind").notNull(),
+    role: roleEnum("role"),
+    actorId: integer("actor_id").references(() => users.id),
+    actorName: text("actor_name").notNull(),
+    text: text("text").notNull(),
+    orderId: text("order_id"),
+    outletId: text("outlet_id"),
+    vehicleId: text("vehicle_id"),
+    tripRunId: uuid("trip_run_id"),
+    source: text("source").notNull().default("online"), // online | offline | system
+    data: jsonb("data"),
+    receivedAt: realTime("received_at"),
+  },
+  (t) => [
+    index("events_order_idx").on(t.orderId),
+    index("events_outlet_idx").on(t.outletId),
+    index("events_trip_idx").on(t.tripRunId),
+  ],
+);
+
+/** Offline records already applied, so a retry is never applied twice. */
+export const clientRecords = pgTable("client_records", {
+  clientId: text("client_id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  kind: text("kind").notNull(),
+  recordedAt: opsTime("recorded_at").notNull(),
+  receivedAt: realTime("received_at"),
+  result: jsonb("result"),
+});
+
+export const media = pgTable("media", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  kind: text("kind").notNull(), // photo | signature
+  mime: text("mime").notNull(),
+  data: bytea("data").notNull(),
+  createdAt: realTime("created_at"),
 });
