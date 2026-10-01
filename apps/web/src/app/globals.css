@@ -1,1 +1,231 @@
 @import "tailwindcss";
+
+/* Build output from parallel dev servers is not source. */
+@source not "../../.next-*";
+@source not "../../scripts";
+
+/* Relay colour tokens, mirrored from the Figma "Relay color" collection (Light mode). */
+@theme {
+  --color-canvas: #f7f5f3;
+  --color-surface: #ffffff;
+  --color-subtle: #f3f1ed;
+  --color-muted: #eae7e2;
+  --color-inverse: #201e1b;
+  --color-line: #e6e3df;
+  --color-line-strong: #cfccc6;
+
+  --color-fg: #1e1b18;
+  --color-fg-2: #56524b;
+  --color-fg-3: #746f68;
+  --color-fg-inverse: #fcfcfa;
+
+  --color-accent: #3460a1;
+  --color-accent-text: #2b528b;
+  --color-accent-tint: #e9f1fd;
+
+  --color-success: #2e885b;
+  --color-success-text: #1d6442;
+  --color-success-tint: #e5f6eb;
+  --color-warning: #e5a243;
+  --color-warning-text: #885720;
+  --color-warning-tint: #fff3da;
+  --color-danger: #be4839;
+  --color-danger-text: #9c3428;
+  --color-danger-tint: #feede9;
+  --color-offline: #77746f;
+  --color-offline-text: #55524c;
+  --color-offline-tint: #eeebe7;
+  --color-chilled: #3094aa;
+  --color-chilled-text: #1c6478;
+  --color-chilled-tint: #e3f5fa;
+
+  --color-fresh: #57914a;
+  --color-fresh-tint: #e8f6e4;
+  --color-style: #bd5f69;
+  --color-tech: #ac713e;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-pop: 0 1px 3px rgb(0 0 0 / 0.06), 0 6px 16px -4px rgb(0 0 0 / 0.05);
+  --shadow-modal:
+    0 2px 6px rgb(0 0 0 / 0.08), 0 24px 48px -12px rgb(0 0 0 / 0.14);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Type scale, mirrored from the Figma UI/* and Field/* text styles. */
+@utility t-display {
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+@utility t-title {
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+@utility t-numeric {
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+@utility t-heading {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility t-subheading {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+@utility t-body {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: -0.003em;
+}
+@utility t-body-m {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: -0.003em;
+}
+@utility t-small {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: -0.002em;
+}
+@utility t-small-m {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: -0.002em;
+}
+@utility t-caption {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+@utility t-caption-m {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
+@utility t-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+@utility t-mono-sm {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+@utility f-hero {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+@utility f-title {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+@utility f-heading {
+  font-size: 19px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility f-body-m {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+@utility f-label {
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: -0.003em;
+}
+@utility f-mono {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+@keyframes relay-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.animate-relay-pulse {
+  animation: relay-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-relay-pulse {
+    animation: none;
+  }
+}
+
+/* Download PDF prints the page: hide prototype controls. */
+@media print {
+  [data-proto] {
+    display: none;
+  }
+}
