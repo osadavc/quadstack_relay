@@ -6,6 +6,8 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "bun --filter @relay/web dev",
+    "build": "bun --filter @relay/web build",
     "db:up": "docker compose up -d db",
     "db:generate": "bun --filter @relay/db generate",
     "db:setup": "bun --filter @relay/db setup",
