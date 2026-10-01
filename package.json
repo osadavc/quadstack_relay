@@ -10,6 +10,7 @@
     "db:generate": "bun --filter @relay/db generate",
     "db:setup": "bun --filter @relay/db setup",
     "db:wipe": "bun --filter @relay/db wipe",
+    "test": "bun --filter @relay/engine test",
     "lint": "biome check .",
     "format": "biome format --write ."
   },
