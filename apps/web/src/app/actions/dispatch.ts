@@ -1,5 +1,6 @@
 "use server";
 
+import type { PolicyId } from "@relay/engine";
 import { cookies } from "next/headers";
 import { act } from "@/server/action";
 import {
@@ -14,7 +15,16 @@ import { workingDay } from "@/server/clock";
 import { currentDepot, DEPOT_COOKIE, depotList } from "@/server/depot";
 import { setVehicleStatus } from "@/server/ops";
 import type { OrderItem } from "@/server/orders";
-import { PlanError } from "@/server/planning";
+import {
+  type DecisionChoice,
+  decide,
+  moveOrder,
+  moveTargets,
+  PlanError,
+  publishPlan,
+  releasePin,
+  runPlan,
+} from "@/server/planning";
 import {
   createProduct,
   importProducts,
@@ -25,6 +35,39 @@ import {
 
 const dispatcher = () => userOrThrow("dispatcher");
 const depotOf = (user: User) => currentDepot(user);
+
+export async function runPlanAction(depot: string, policy: PolicyId) {
+  return act(async () => runPlan(await dispatcher(), depot, policy));
+}
+
+export async function decideAction(decisionId: string, choice: DecisionChoice) {
+  return act(async () => decide(await dispatcher(), decisionId, choice));
+}
+
+export async function moveTargetsAction(planId: string, orderId: string) {
+  return act(async () => {
+    await dispatcher();
+    return moveTargets(planId, orderId);
+  });
+}
+
+export async function moveOrderAction(
+  planId: string,
+  orderId: string,
+  target: { vehicleId: string } | { defer: string },
+) {
+  return act(async () =>
+    moveOrder(await dispatcher(), planId, orderId, target),
+  );
+}
+
+export async function releasePinAction(planId: string, orderId: string) {
+  return act(async () => releasePin(await dispatcher(), planId, orderId));
+}
+
+export async function publishAction(planId: string) {
+  return act(async () => publishPlan(await dispatcher(), planId));
+}
 
 export async function setDepotAction(depot: string) {
   return act(async () => {
