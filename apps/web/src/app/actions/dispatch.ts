@@ -13,7 +13,7 @@ import {
 import { type User, userOrThrow } from "@/server/auth";
 import { workingDay } from "@/server/clock";
 import { currentDepot, DEPOT_COOKIE, depotList } from "@/server/depot";
-import { setVehicleStatus } from "@/server/ops";
+import { messageDriver, setVehicleStatus, warnStores } from "@/server/ops";
 import type { OrderItem } from "@/server/orders";
 import {
   type DecisionChoice,
@@ -67,6 +67,16 @@ export async function releasePinAction(planId: string, orderId: string) {
 
 export async function publishAction(planId: string) {
   return act(async () => publishPlan(await dispatcher(), planId));
+}
+
+export async function messageDriverAction(runId: string, text: string) {
+  return act(async () => messageDriver(await dispatcher(), runId, text));
+}
+
+export async function warnStoresAction(
+  stops: { outletId: string; vehicleId: string; expected: string }[],
+) {
+  return act(async () => warnStores(await dispatcher(), stops));
 }
 
 export async function setDepotAction(depot: string) {
