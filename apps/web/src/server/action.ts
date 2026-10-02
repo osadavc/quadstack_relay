@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { AdminError } from "./admin";
 import { AuthError } from "./auth";
 import { OrderError } from "./orders";
 import { PlanError } from "./planning";
@@ -8,7 +9,7 @@ export type ActionResult<T = null> =
   | { ok: true; data: T }
   | { ok: false; error: string };
 
-const KNOWN = [AuthError, PlanError, ProductError, OrderError];
+const KNOWN = [AuthError, AdminError, PlanError, ProductError, OrderError];
 
 /** Run a mutation, refresh every screen, and turn known errors into messages. */
 export async function act<T>(fn: () => Promise<T>): Promise<ActionResult<T>> {
