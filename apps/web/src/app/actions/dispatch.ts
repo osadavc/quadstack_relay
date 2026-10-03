@@ -7,6 +7,13 @@ import { workingDay } from "@/server/clock";
 import { currentDepot, DEPOT_COOKIE, depotList } from "@/server/depot";
 import { setVehicleStatus } from "@/server/ops";
 import { PlanError } from "@/server/planning";
+import {
+  createProduct,
+  importProducts,
+  type ProductInput,
+  setProductActive,
+  updateProduct,
+} from "@/server/products";
 
 const dispatcher = () => userOrThrow("dispatcher");
 const depotOf = (user: User) => currentDepot(user);
@@ -41,4 +48,22 @@ export async function vehicleStatusAction(
       note,
     );
   });
+}
+
+/* ---------- Products ---------- */
+
+export async function createProductAction(input: ProductInput) {
+  return act(async () => createProduct(await dispatcher(), input));
+}
+
+export async function updateProductAction(id: number, input: ProductInput) {
+  return act(async () => updateProduct(await dispatcher(), id, input));
+}
+
+export async function setProductActiveAction(id: number, active: boolean) {
+  return act(async () => setProductActive(await dispatcher(), id, active));
+}
+
+export async function importProductsAction(csv: string) {
+  return act(async () => importProducts(await dispatcher(), csv));
 }
