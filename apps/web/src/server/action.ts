@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { AdminError } from "./admin";
 import { AuthError } from "./auth";
 import { DockError } from "./dock";
+import { DriverError } from "./driver";
 import { OrderError } from "./orders";
 import { PlanError } from "./planning";
 import { ProductError } from "./products";
@@ -16,6 +17,7 @@ const KNOWN = [
   PlanError,
   ProductError,
   DockError,
+  DriverError,
   OrderError,
 ];
 
