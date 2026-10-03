@@ -2,10 +2,18 @@
 
 import { cookies } from "next/headers";
 import { act } from "@/server/action";
+import {
+  createPhoneOrder,
+  createUser,
+  type NewUser,
+  resetPassword,
+  setUserActive,
+} from "@/server/admin";
 import { type User, userOrThrow } from "@/server/auth";
 import { workingDay } from "@/server/clock";
 import { currentDepot, DEPOT_COOKIE, depotList } from "@/server/depot";
 import { setVehicleStatus } from "@/server/ops";
+import type { OrderItem } from "@/server/orders";
 import { PlanError } from "@/server/planning";
 import {
   createProduct,
@@ -48,6 +56,27 @@ export async function vehicleStatusAction(
       note,
     );
   });
+}
+
+/* ---------- People and phoned-in orders ---------- */
+
+export async function createUserAction(input: NewUser) {
+  return act(async () => createUser(await dispatcher(), input));
+}
+
+export async function setUserActiveAction(id: number, active: boolean) {
+  return act(async () => setUserActive(await dispatcher(), id, active));
+}
+
+export async function resetPasswordAction(id: number, password: string) {
+  return act(async () => {
+    await dispatcher();
+    return resetPassword(id, password);
+  });
+}
+
+export async function phoneOrderAction(outletId: string, items: OrderItem[]) {
+  return act(async () => createPhoneOrder(await dispatcher(), outletId, items));
 }
 
 /* ---------- Products ---------- */
