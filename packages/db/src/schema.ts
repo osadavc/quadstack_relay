@@ -254,6 +254,32 @@ export const orders = pgTable(
   ],
 );
 
+/**
+ * What stores can order, kept by dispatch. Nothing is loaded by default:
+ * the General Data files have no products. Weight and volume are per unit
+ * and an order's totals are worked out from them.
+ */
+export const products = pgTable(
+  "products",
+  {
+    id: serial("id").primaryKey(),
+    sku: text("sku").notNull(),
+    name: text("name").notNull(),
+    brand: brandEnum("brand").notNull(),
+    temp: tempEnum("temp").notNull(),
+    /** What one unit is: a case, a carton, an item. */
+    unit: text("unit").notNull(),
+    weightKg: doublePrecision("weight_kg").notNull(),
+    volumeM3: doublePrecision("volume_m3").notNull(),
+    active: boolean("active").notNull().default(true),
+    createdAt: realTime("created_at"),
+  },
+  (t) => [
+    uniqueIndex("products_sku_idx").on(t.sku),
+    index("products_brand_idx").on(t.brand, t.temp),
+  ],
+);
+
 export const orderLines = pgTable(
   "order_lines",
   {
@@ -262,6 +288,8 @@ export const orderLines = pgTable(
       .notNull()
       .references(() => orders.id, { onDelete: "cascade" }),
     lineNo: integer("line_no").notNull(),
+    /** The product ordered, when the line is one; its figures are copied onto the line. */
+    productId: integer("product_id").references(() => products.id),
     category: text("category").notNull(),
     name: text("name").notNull(),
     unitLabel: text("unit_label").notNull(),
