@@ -1,0 +1,47 @@
+# `docker compose up` starts the whole stack: Postgres, a one-off setup job
+# that applies migrations and loads the datasets and accounts, and the web app.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-relay}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-relay}
+      POSTGRES_DB: ${POSTGRES_DB:-relay}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-relay} -d ${POSTGRES_DB:-relay}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  setup:
+    build:
+      context: .
+      target: setup
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-relay}:${POSTGRES_PASSWORD:-relay}@db:5432/${POSTGRES_DB:-relay}
+      SEED_PASSWORD: ${SEED_PASSWORD:-relay2026}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  web:
+    build:
+      context: .
+      target: web
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-relay}:${POSTGRES_PASSWORD:-relay}@db:5432/${POSTGRES_DB:-relay}
+      AUTH_SECRET: ${AUTH_SECRET:-change-me-to-a-long-random-string}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  pgdata:
