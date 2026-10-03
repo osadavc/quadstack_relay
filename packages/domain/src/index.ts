@@ -1,3 +1,4 @@
+export * from "./catalogue";
 export * from "./time";
 
 export type Role = "dispatcher" | "loader" | "driver" | "store";
