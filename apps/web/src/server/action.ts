@@ -6,6 +6,7 @@ import { DriverError } from "./driver";
 import { OrderError } from "./orders";
 import { PlanError } from "./planning";
 import { ProductError } from "./products";
+import { StoreError } from "./store";
 
 export type ActionResult<T = null> =
   | { ok: true; data: T }
@@ -19,6 +20,7 @@ const KNOWN = [
   DockError,
   DriverError,
   OrderError,
+  StoreError,
 ];
 
 /** Run a mutation, refresh every screen, and turn known errors into messages. */
