@@ -10,9 +10,10 @@
     "build": "bun --filter @relay/web build",
     "db:up": "docker compose up -d db",
     "db:generate": "bun --filter @relay/db generate",
-    "db:setup": "bun --filter @relay/db setup",
+    "db:setup": "bun packages/db/src/migrate.ts && bun packages/db/seed/index.ts",
+    "db:seed-day": "bun packages/db/src/migrate.ts && bun packages/db/seed/load-day.ts",
     "db:wipe": "bun --filter @relay/db wipe",
-    "test": "bun --filter @relay/engine test",
+    "test": "bun --filter @relay/engine test && bun --filter @relay/db test",
     "lint": "biome check .",
     "format": "biome format --write ."
   },

@@ -1,0 +1,527 @@
+{
+  "verifiedAt": "2026-10-04T18:08:11.890Z",
+  "applicationTables": 33,
+  "applicationRows": 2488,
+  "sequences": 5,
+  "tables": [
+    {
+      "schema": "drizzle",
+      "table": "__drizzle_migrations",
+      "rows": 3,
+      "sha256": "9fc2533902537068f6a473a367a706468009d44cd705073e911b9d0a27983a22",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "calendar",
+      "rows": 910,
+      "sha256": "d3ae348f14051485f7139e7781941657fa889d75ee50805b6e1417793f1694c8",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "client_records",
+      "rows": 4,
+      "sha256": "1564b42ce55b349e1e059d4b607093e69c62c52f28a1951069ed6a1692069722",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "decisions",
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "depots",
+      "rows": 2,
+      "sha256": "ebe8d0cf09b099c72c2358eefc3210fab95b55a00b542b50b476d73b0b0b32a3",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "districts",
+      "rows": 12,
+      "sha256": "0daadcca3390cb9f3365cd15ef8a7f71000768ec4d7bcbb5270563fe21f2a9ba",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "events",
+      "rows": 148,
+      "sha256": "722a8290d58ed753b8d5072d779c5cd8e1d70170bdf2e056de0b1b3b51ccd141",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "fuel_log",
+      "rows": 1,
+      "sha256": "1680688445084d9a0c568f3d6ca9da64c636b34c1287f213dec6b30ca87eba7a",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "issues",
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "load_units",
+      "rows": 6,
+      "sha256": "bec865c446546b96d766c10e837b99c07635d96c4b529e1d15092692fec0df05",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "media",
+      "rows": 2,
+      "sha256": "e6e527f3696bf290e3bf0f304c18799dc48bbcc15349bb5e71fdcfdaa64d5e44",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "messages",
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "notifications",
+      "rows": 5,
+      "sha256": "6cd7ef404d8750a3304cd323d25a7302aef99a394950e017432dd957fd2cb356",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "ops_state",
+      "rows": 1,
+      "sha256": "75917a0f54d3459510c1d383037fa67d7a24d8adc4b9775d8a18cc394a47cf06",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "order_lines",
+      "rows": 712,
+      "sha256": "3eb5e5515d128df5bc15fc3bed7fe1a8007d7c243f72f75556f9c967467ad020",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "orders",
+      "rows": 138,
+      "sha256": "11d0efff8ea9eb594baeb478d91313ebae91ed2ee83b0d4c06ecd70adbf73655",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "outlets",
+      "rows": 120,
+      "sha256": "fa4a3ec7c88520daab8edb33aa63bf98029695f1d601f820791bbe1f272b94ee",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "pins",
+      "rows": 2,
+      "sha256": "652ed8694162a1fadef376d03f43ee90b9010decd01104822564c37c15d48871",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "plan_assignments",
+      "rows": 1,
+      "sha256": "40557f9729124cbae5fb391d3d136cc1aeabecd68e42749af17b08fe55d7cf1c",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "plan_stops",
+      "rows": 1,
+      "sha256": "5370db37dcb9d71b78f036e4e9b6a1d2f125cfaeae313836e48ca0319cb467dd",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "plan_trips",
+      "rows": 1,
+      "sha256": "fefb1d51daa6eb0b9ceb3eae165a70a55a744be9c8c381eb5790559ac0104a5f",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "plans",
+      "rows": 1,
+      "sha256": "f7b7b83a4e7caf720e665123d955439eb956d51c9434200e6531340c466d694e",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "products",
+      "rows": 65,
+      "sha256": "d206172069a413b345b4d3ba83ca5786680868a2360052fd97469301b593af2d",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "receipts",
+      "rows": 1,
+      "sha256": "c6e6aa26374388f33fa73be377f3aaa7dd01f1ee6229fcac5fd6161492dcd332",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "reconciliations",
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "service_allowances",
+      "rows": 9,
+      "sha256": "fe681dac99a29b0b8bf974f18b7a1493978fec1821bffe0730daf71029c1adcb",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "service_log",
+      "rows": 274,
+      "sha256": "e9e1924b1bd560e99e7dd9ea0b0a03150fff4f3b7013b6273e346b51b25ae9ac",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "shortfalls",
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "stop_runs",
+      "rows": 1,
+      "sha256": "b40c01005a007637770a7c24ef28b1421bbfe567787ab70a39bfa587f1b47c4a",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "trip_runs",
+      "rows": 1,
+      "sha256": "cd0668ee6626c48ea71ce796fb3bab4b8cfa9cf8860684a336e4e98bb19d69aa",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "users",
+      "rows": 7,
+      "sha256": "ecfda75716757f06afe3b1fc5e65b55296498fee1a41b6159d8afc4977a3976f",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "vehicle_days",
+      "rows": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "equal": true
+    },
+    {
+      "schema": "public",
+      "table": "vehicles",
+      "rows": 60,
+      "sha256": "60fdbe3dc251d9af792bdeeddcf3a094a30b93433b9a858a29c665b80eda93e4",
+      "equal": true
+    }
+  ],
+  "schema": [
+    {
+      "check": "columns",
+      "objects": 315,
+      "equal": true
+    },
+    {
+      "check": "constraints",
+      "objects": 93,
+      "equal": true
+    },
+    {
+      "check": "indexes",
+      "objects": 51,
+      "equal": true
+    },
+    {
+      "check": "enums",
+      "objects": 8,
+      "equal": true
+    },
+    {
+      "check": "sequences",
+      "objects": 5,
+      "equal": true
+    }
+  ],
+  "overview": {
+    "outlets": [
+      {
+        "brand": "Fresh",
+        "depot": "Kandy",
+        "outlets": 31
+      },
+      {
+        "brand": "Style",
+        "depot": "Kandy",
+        "outlets": 9
+      },
+      {
+        "brand": "Tech",
+        "depot": "Kandy",
+        "outlets": 5
+      },
+      {
+        "brand": "Fresh",
+        "depot": "Peliyagoda",
+        "outlets": 49
+      },
+      {
+        "brand": "Style",
+        "depot": "Peliyagoda",
+        "outlets": 16
+      },
+      {
+        "brand": "Tech",
+        "depot": "Peliyagoda",
+        "outlets": 10
+      }
+    ],
+    "vehicles": [
+      {
+        "depot": "Kandy",
+        "type": "truck",
+        "temp": "ambient",
+        "vehicles": 13
+      },
+      {
+        "depot": "Kandy",
+        "type": "truck",
+        "temp": "reefer",
+        "vehicles": 5
+      },
+      {
+        "depot": "Kandy",
+        "type": "van",
+        "temp": "ambient",
+        "vehicles": 2
+      },
+      {
+        "depot": "Kandy",
+        "type": "van",
+        "temp": "reefer",
+        "vehicles": 2
+      },
+      {
+        "depot": "Peliyagoda",
+        "type": "truck",
+        "temp": "ambient",
+        "vehicles": 27
+      },
+      {
+        "depot": "Peliyagoda",
+        "type": "truck",
+        "temp": "reefer",
+        "vehicles": 7
+      },
+      {
+        "depot": "Peliyagoda",
+        "type": "van",
+        "temp": "ambient",
+        "vehicles": 2
+      },
+      {
+        "depot": "Peliyagoda",
+        "type": "van",
+        "temp": "reefer",
+        "vehicles": 2
+      }
+    ],
+    "products": [
+      {
+        "brand": "Fresh",
+        "temp": "chilled",
+        "active": false,
+        "products": 1
+      },
+      {
+        "brand": "Fresh",
+        "temp": "chilled",
+        "active": true,
+        "products": 16
+      },
+      {
+        "brand": "Fresh",
+        "temp": "ambient",
+        "active": true,
+        "products": 20
+      },
+      {
+        "brand": "Fresh",
+        "temp": "frozen",
+        "active": true,
+        "products": 4
+      },
+      {
+        "brand": "Style",
+        "temp": "ambient",
+        "active": true,
+        "products": 12
+      },
+      {
+        "brand": "Tech",
+        "temp": "ambient",
+        "active": true,
+        "products": 12
+      }
+    ],
+    "users": [
+      {
+        "name": "Gayan Gimhana",
+        "email": "gayan@waypoint.lk",
+        "role": "dispatcher",
+        "depot": "Peliyagoda",
+        "outlet_id": null,
+        "vehicle_id": null,
+        "active": true
+      },
+      {
+        "name": "Gayashan Gamage",
+        "email": "gayashan@waypoint.lk",
+        "role": "loader",
+        "depot": "Peliyagoda",
+        "outlet_id": null,
+        "vehicle_id": null,
+        "active": true
+      },
+      {
+        "name": "Nimal Vidath",
+        "email": "nimal@waypoint.lk",
+        "role": "driver",
+        "depot": "Peliyagoda",
+        "outlet_id": null,
+        "vehicle_id": "VEH007",
+        "active": true
+      },
+      {
+        "name": "Yoshitha Dissanayake",
+        "email": "yoshitha@waypoint.lk",
+        "role": "store",
+        "depot": null,
+        "outlet_id": "OUT074",
+        "vehicle_id": null,
+        "active": true
+      },
+      {
+        "name": "Kanishka Perera",
+        "email": "kanishka@waypoint.lk",
+        "role": "store",
+        "depot": null,
+        "outlet_id": "OUT053",
+        "vehicle_id": null,
+        "active": true
+      },
+      {
+        "name": "Osada Sethum",
+        "email": "osada@waypoint.lk",
+        "role": "driver",
+        "depot": "Peliyagoda",
+        "outlet_id": null,
+        "vehicle_id": "VEH035",
+        "active": true
+      },
+      {
+        "name": "Thenul Bandara",
+        "email": "thenul@waypoint.lk",
+        "role": "store",
+        "depot": null,
+        "outlet_id": "OUT065",
+        "vehicle_id": null,
+        "active": true
+      }
+    ],
+    "days": [
+      {
+        "delivery_day": "2026-10-06T00:00:00.000Z",
+        "status": "received",
+        "orders": 1,
+        "outlets": 1,
+        "kg": "163.3",
+        "m3": "0.798"
+      },
+      {
+        "delivery_day": "2026-10-07T00:00:00.000Z",
+        "status": "confirmed",
+        "orders": 137,
+        "outlets": 89,
+        "kg": "111123.7",
+        "m3": "602.862"
+      }
+    ],
+    "demoBreakdown": [
+      {
+        "brand": "Fresh",
+        "temp": "chilled",
+        "orders": 40
+      },
+      {
+        "brand": "Fresh",
+        "temp": "ambient",
+        "orders": 80
+      },
+      {
+        "brand": "Fresh",
+        "temp": "frozen",
+        "orders": 8
+      },
+      {
+        "brand": "Style",
+        "temp": "ambient",
+        "orders": 5
+      },
+      {
+        "brand": "Tech",
+        "temp": "ambient",
+        "orders": 4
+      }
+    ],
+    "calendar": [
+      {
+        "start": "2024-01-01T00:00:00.000Z",
+        "end": "2026-06-28T00:00:00.000Z",
+        "dates": 910
+      }
+    ],
+    "history": [
+      {
+        "outcome": "served",
+        "records": 274
+      }
+    ],
+    "issues": [
+      {
+        "shortfalls": 0,
+        "open_reconciliations": 0,
+        "open_issues": 0
+      }
+    ]
+  },
+  "access": {
+    "application_tables": "database-owner-only",
+    "application_sequences": "database-owner-only",
+    "managed_schemas": "retained",
+    "owner_mapping": {
+      "local": "relay",
+      "target": "postgres"
+    }
+  }
+}

@@ -1,12 +1,12 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { DB } from "../src/client";
+import type { DB, DBOrTx } from "../src/client";
 import { hashPassword } from "../src/password";
 import * as s from "../src/schema";
 
 /*
- * Loads the General Data files the Hackathon needs and one account per role.
+ * Loads the General Data files the Hackathon needs and the seven demo accounts.
  * outlets.csv, vehicles.csv and calendar.csv are the shared datasets;
  * district_travel.csv and service_allowance.csv give the travel and
  * unloading minutes needed to check delivery windows and fuel quotas.
@@ -29,6 +29,29 @@ export function csv(name: string): Record<string, string>[] {
 
 /** Password for the starting accounts. Change it after the first sign-in. */
 export const START_PASSWORD = process.env.SEED_PASSWORD ?? "relay2026";
+
+/** Add missing demo accounts by email, preserving existing profiles and passwords. */
+export async function seedUsers(db: DBOrTx) {
+  const hash = hashPassword(START_PASSWORD);
+  return db
+    .insert(s.users)
+    .values(
+      csv("demo_users.csv").map((u) => ({
+        email: u.email,
+        name: u.name,
+        role: u.role as typeof s.users.$inferInsert.role,
+        title: u.title,
+        phone: u.phone || null,
+        depot: u.depot || null,
+        outletId: u.outlet_id || null,
+        vehicleId: u.vehicle_id || null,
+        active: u.active === "1",
+        passwordHash: hash,
+      })),
+    )
+    .onConflictDoNothing({ target: s.users.email })
+    .returning({ email: s.users.email });
+}
 
 export async function seedReference(db: DB) {
   const outlets = csv("outlets.csv");
@@ -108,45 +131,5 @@ export async function seedReference(db: DB) {
   for (let i = 0; i < cal.length; i += 300)
     await db.insert(s.calendar).values(cal.slice(i, i + 300));
 
-  // One account per role to start with. Dispatch adds everyone else.
-  const hash = hashPassword(START_PASSWORD);
-  const truck = vehicles.find((v) => v.vehicle_id === "VEH007");
-  const store = outlets.find((o) => o.outlet_id === "OUT074");
-  if (!truck || !store)
-    throw new Error("VEH007 or OUT074 missing from the data");
-  await db.insert(s.users).values([
-    {
-      email: "gayan@waypoint.lk",
-      name: "Gayan Gimhana",
-      role: "dispatcher",
-      title: `Dispatcher · ${truck.depot}`,
-      depot: truck.depot,
-      passwordHash: hash,
-    },
-    {
-      email: "gayashan@waypoint.lk",
-      name: "Gayashan Gamage",
-      role: "loader",
-      title: `Loader · ${truck.depot}`,
-      depot: truck.depot,
-      passwordHash: hash,
-    },
-    {
-      email: "nimal@waypoint.lk",
-      name: "Nimal Vidath",
-      role: "driver",
-      title: "Driver · VEH007",
-      depot: truck.depot,
-      vehicleId: "VEH007",
-      passwordHash: hash,
-    },
-    {
-      email: "yoshitha@waypoint.lk",
-      name: "Yoshitha Dissanayake",
-      role: "store",
-      title: "Store manager · OUT074",
-      outletId: "OUT074",
-      passwordHash: hash,
-    },
-  ]);
+  await seedUsers(db);
 }

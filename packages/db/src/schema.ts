@@ -255,8 +255,8 @@ export const orders = pgTable(
 );
 
 /**
- * What stores can order, kept by dispatch. Nothing is loaded by default:
- * the General Data files have no products. Weight and volume are per unit
+ * What stores can order, kept by dispatch. The General Data files have no
+ * products; the delivery-day seed supplies an illustrative demo catalogue. Weight and volume are per unit
  * and an order's totals are worked out from them.
  */
 export const products = pgTable(

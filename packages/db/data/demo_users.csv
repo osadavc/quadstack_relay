@@ -1,0 +1,8 @@
+email,name,role,title,phone,depot,outlet_id,vehicle_id,active
+gayan@waypoint.lk,Gayan Gimhana,dispatcher,Dispatcher · Peliyagoda,,Peliyagoda,,,1
+gayashan@waypoint.lk,Gayashan Gamage,loader,Loader · Peliyagoda,,Peliyagoda,,,1
+nimal@waypoint.lk,Nimal Vidath,driver,Driver · VEH007,,Peliyagoda,,VEH007,1
+yoshitha@waypoint.lk,Yoshitha Dissanayake,store,Store manager · OUT074,,,OUT074,,1
+kanishka@waypoint.lk,Kanishka Perera,store,Store manager · OUT053,,,OUT053,,1
+osada@waypoint.lk,Osada Sethum,driver,Driver · VEH035,,Peliyagoda,,VEH035,1
+thenul@waypoint.lk,Thenul Bandara,store,Store manager · OUT065,0712435678,,OUT065,,1

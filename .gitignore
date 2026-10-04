@@ -9,3 +9,6 @@ dist
 next-env.d.ts
 .DS_Store
 coverage
+
+# Upload-only account credentials
+/output/Seeded_Account_Credentials.txt

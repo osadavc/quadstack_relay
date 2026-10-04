@@ -1,0 +1,65 @@
+sku,name,brand,temp,unit,weight_kg,volume_m3
+DEMO-FR-C001,Fresh milk 1L x 12,Fresh,chilled,Case,12.5,0.04
+DEMO-FR-C002,Yoghurt cups x 24,Fresh,chilled,Case,6,0.03
+DEMO-FR-C003,Cheese packs x 20,Fresh,chilled,Case,8,0.04
+DEMO-FR-C004,Butter packs x 40,Fresh,chilled,Case,10,0.035
+DEMO-FR-C005,Fresh cream 250ml x 24,Fresh,chilled,Case,6.8,0.028
+DEMO-FR-C006,Curd tubs 500g x 12,Fresh,chilled,Case,6.5,0.035
+DEMO-FR-C007,Paneer packs 200g x 24,Fresh,chilled,Case,5.2,0.026
+DEMO-FR-C008,Mozzarella packs 500g x 12,Fresh,chilled,Case,6.5,0.032
+DEMO-FR-C009,Fresh juice 1L x 12,Fresh,chilled,Case,12.6,0.04
+DEMO-FR-C010,Chilled chicken trays 1kg x 10,Fresh,chilled,Case,10.8,0.045
+DEMO-FR-C011,Chilled fish fillets 500g x 12,Fresh,chilled,Case,6.6,0.035
+DEMO-FR-C012,Sausage packs 500g x 20,Fresh,chilled,Case,10.7,0.038
+DEMO-FR-C013,Dairy dessert cups 100g x 24,Fresh,chilled,Case,3,0.022
+DEMO-FR-C014,Tofu packs 250g x 24,Fresh,chilled,Case,6.6,0.033
+DEMO-FR-C015,Fresh pasta packs 400g x 12,Fresh,chilled,Case,5.3,0.03
+DEMO-FR-C016,Greek yoghurt tubs 500g x 12,Fresh,chilled,Case,6.5,0.035
+DEMO-FR-A001,Rice bags 5kg x 4,Fresh,ambient,Carton,20.5,0.045
+DEMO-FR-A002,Bottled water 1L x 12,Fresh,ambient,Case,12.5,0.035
+DEMO-FR-A003,Flour packs 1kg x 10,Fresh,ambient,Carton,10.3,0.025
+DEMO-FR-A004,Bananas 10kg,Fresh,ambient,Crate,11,0.06
+DEMO-FR-A005,Sugar packs 1kg x 10,Fresh,ambient,Carton,10.3,0.025
+DEMO-FR-A006,Red lentil packs 1kg x 10,Fresh,ambient,Carton,10.3,0.025
+DEMO-FR-A007,Tea packs 200g x 24,Fresh,ambient,Carton,5.4,0.04
+DEMO-FR-A008,Instant coffee jars 100g x 24,Fresh,ambient,Carton,3.6,0.028
+DEMO-FR-A009,Cooking oil bottles 1L x 12,Fresh,ambient,Case,11.8,0.037
+DEMO-FR-A010,Biscuit packs 200g x 24,Fresh,ambient,Carton,5.6,0.043
+DEMO-FR-A011,Canned tuna 185g x 24,Fresh,ambient,Carton,5.4,0.027
+DEMO-FR-A012,Noodle packs 400g x 20,Fresh,ambient,Carton,8.7,0.048
+DEMO-FR-A013,Spice packs 100g x 40,Fresh,ambient,Carton,4.5,0.028
+DEMO-FR-A014,Potatoes 20kg,Fresh,ambient,Crate,21,0.075
+DEMO-FR-A015,Onions 20kg,Fresh,ambient,Crate,21,0.075
+DEMO-FR-A016,Tomatoes 10kg,Fresh,ambient,Crate,11,0.06
+DEMO-FR-A017,Apples 10kg,Fresh,ambient,Crate,11,0.06
+DEMO-FR-A018,Eggs x 180,Fresh,ambient,Carton,12,0.09
+DEMO-FR-A019,Bread loaves x 20,Fresh,ambient,Crate,9,0.12
+DEMO-FR-A020,Breakfast cereal 500g x 12,Fresh,ambient,Carton,6.6,0.08
+DEMO-ST-A001,T-shirts x 40,Style,ambient,Carton,9,0.12
+DEMO-ST-A002,Hanging shirts x 20,Style,ambient,Carton,8,0.4
+DEMO-ST-A003,Jeans x 20,Style,ambient,Carton,15,0.12
+DEMO-ST-A004,Bedsheet sets x 10,Style,ambient,Carton,12,0.16
+DEMO-ST-A005,Dresses on hangers x 15,Style,ambient,Carton,10,0.45
+DEMO-ST-A006,School uniform sets x 20,Style,ambient,Carton,12,0.16
+DEMO-ST-A007,Jackets on hangers x 10,Style,ambient,Carton,12,0.4
+DEMO-ST-A008,Cotton towels x 24,Style,ambient,Carton,14,0.2
+DEMO-ST-A009,Socks pairs x 100,Style,ambient,Carton,7,0.07
+DEMO-ST-A010,Shoes boxed pairs x 12,Style,ambient,Carton,15,0.25
+DEMO-ST-A011,Handbags x 12,Style,ambient,Carton,10,0.24
+DEMO-ST-A012,Curtain sets x 10,Style,ambient,Carton,18,0.22
+DEMO-TE-A001,Refrigerator 250L,Tech,ambient,Item,65,0.8
+DEMO-TE-A002,Washing machine 7kg,Tech,ambient,Item,62,0.5
+DEMO-TE-A003,LED television 43 inch,Tech,ambient,Item,12,0.16
+DEMO-TE-A004,Electric kettles x 6,Tech,ambient,Carton,9,0.08
+DEMO-TE-A005,Microwave oven 20L,Tech,ambient,Item,14,0.08
+DEMO-TE-A006,Rice cooker 1.8L,Tech,ambient,Item,4,0.025
+DEMO-TE-A007,Standing fan 16 inch,Tech,ambient,Item,6,0.08
+DEMO-TE-A008,Blenders x 4,Tech,ambient,Carton,14,0.09
+DEMO-TE-A009,Steam irons x 6,Tech,ambient,Carton,10,0.065
+DEMO-TE-A010,Laptops boxed x 5,Tech,ambient,Carton,14,0.07
+DEMO-TE-A011,Smartphones boxed x 20,Tech,ambient,Carton,8,0.035
+DEMO-TE-A012,Air conditioner indoor and outdoor units,Tech,ambient,Item,48,0.45
+DEMO-FR-F001,Ice cream tubs 1L x 12,Fresh,frozen,Case,7.2,0.055
+DEMO-FR-F002,Frozen vegetables 1kg x 10,Fresh,frozen,Case,10.5,0.04
+DEMO-FR-F003,Frozen chicken portions 1kg x 10,Fresh,frozen,Case,10.8,0.045
+DEMO-FR-F004,Frozen fish 500g x 12,Fresh,frozen,Case,6.6,0.035
