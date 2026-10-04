@@ -402,7 +402,9 @@ export function OrderQueue({
                 </div>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-auto scroll-thin max-xl:overflow-visible">
+              {/* `relative` keeps the rows' absolutely positioned sr-only
+                  labels inside this scroller instead of stretching the page. */}
+              <div className="relative min-h-0 flex-1 overflow-auto scroll-thin max-xl:overflow-visible">
                 <div className="min-w-[800px] max-xl:min-w-0 max-xl:border-t max-xl:border-line">
                   <div className="sticky top-0 z-10 flex h-[34px] items-center border-y border-line bg-subtle px-3 t-caption-m text-fg-3 max-xl:hidden">
                     <span className={COL.check} />
