@@ -17,7 +17,7 @@ import { logEvent } from "./record";
 export class OrderError extends Error {}
 
 export const orderItem = z.object({
-  temp: z.enum(["chilled", "ambient"]),
+  temp: z.enum(["chilled", "ambient", "frozen"]),
   units: z.number().int("Units are whole numbers").min(0).max(100_000),
   weightKg: z.number().min(0).max(100_000),
   volumeM3: z.number().min(0).max(1_000),
@@ -114,7 +114,7 @@ const round = (n: number) => Math.round(n * 1e6) / 1e6;
 async function linesFor(
   tx: DBOrTx,
   brand: string,
-  temp: "chilled" | "ambient",
+  temp: OrderItem["temp"],
   item: OrderItem,
 ): Promise<Line[]> {
   if (!item.lines) {

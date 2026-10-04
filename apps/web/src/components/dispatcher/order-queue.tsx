@@ -1,5 +1,7 @@
 "use client";
 
+import { requiresRefrigeration } from "@relay/domain";
+
 import {
   ArrowRight,
   Check,
@@ -105,7 +107,7 @@ export function OrderQueue({
 
   const needle = query.trim().toLowerCase();
   const rows = q.rows.filter((r) => {
-    if (filter === "chilled" && r.temp !== "chilled") return false;
+    if (filter === "chilled" && !requiresRefrigeration(r.temp)) return false;
     if (filter === "flagged" && !flagged(r)) return false;
     if (district !== "all" && r.district !== district) return false;
     if (brand !== "all" && r.brand !== brand) return false;
@@ -141,7 +143,7 @@ export function OrderQueue({
     {
       label: "Fresh",
       value: String(q.summary.fresh),
-      note: `${q.summary.freshAmbient} ambient · ${q.summary.freshChilled} chilled`,
+      note: `${q.summary.freshAmbient} ambient · ${q.summary.freshChilled} refrigerated`,
     },
     {
       label: "Style",
@@ -155,7 +157,7 @@ export function OrderQueue({
       note: `${Math.round(q.summary.weight).toLocaleString("en-GB")} kg`,
     },
     {
-      label: "Chilled",
+      label: "Refrigerated",
       value: `${q.summary.chilled.toFixed(1)} m³`,
       note: "needs a reefer",
     },
@@ -332,9 +334,10 @@ export function OrderQueue({
                     },
                     {
                       value: "chilled",
-                      label: "Chilled",
+                      label: "Refrigerated",
                       count: String(
-                        q.rows.filter((r) => r.temp === "chilled").length,
+                        q.rows.filter((r) => requiresRefrigeration(r.temp))
+                          .length,
                       ),
                     },
                     {
@@ -700,7 +703,9 @@ function OrderDrawer({
               size="sm"
             >
               {row.unserved} days since{" "}
-              {row.temp === "chilled" ? "chilled stock" : "a delivery"}
+              {requiresRefrigeration(row.temp)
+                ? `${row.temp} stock`
+                : "a delivery"}
             </Pill>
           ) : null}
         </div>

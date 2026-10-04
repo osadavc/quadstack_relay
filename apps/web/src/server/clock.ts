@@ -33,10 +33,22 @@ export async function revision(tx: DBOrTx = db): Promise<number> {
 export const cutoffFor = (day: string) => `${addDays(day, -1)} ${CUTOFF}:00`;
 
 /** The day an order placed now is for. */
-export async function orderingDay(tx: DBOrTx = db) {
+export async function orderingDay(tx: DBOrTx = db, depot?: string) {
   const t = now();
   let day = await nextOperatingDay(tx, t.slice(0, 10));
   if (cmpOps(t, cutoffFor(day)) >= 0) day = await nextOperatingDay(tx, day);
+  // Creating the first plan closes that depot's queue, even before 16:00.
+  if (depot) {
+    while (true) {
+      const [plan] = await tx
+        .select({ id: s.plans.id })
+        .from(s.plans)
+        .where(and(eq(s.plans.day, day), eq(s.plans.depot, depot)))
+        .limit(1);
+      if (!plan) break;
+      day = await nextOperatingDay(tx, day);
+    }
+  }
   return day;
 }
 
@@ -56,7 +68,7 @@ export async function workingDay(
       ? and(inArray(s.orders.status, [...OPEN]), eq(s.outlets.depot, depot))
       : inArray(s.orders.status, [...OPEN]),
   );
-  return row?.day ?? (await orderingDay(tx));
+  return row?.day ?? (await orderingDay(tx, depot));
 }
 
 /** The day the dock and the live board follow: the earliest day with unfinished trips, else the latest. */

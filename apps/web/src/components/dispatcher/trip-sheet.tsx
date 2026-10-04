@@ -1,5 +1,7 @@
 "use client";
 
+import type { Temp } from "@relay/domain";
+
 import { CalendarX, CircleCheck, CircleX, MoveRight, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
@@ -164,9 +166,7 @@ export function TripSheet({
                       </div>
                       {st.orderIds.map((id, i) => (
                         <div key={id} className="flex items-center gap-2 pl-8">
-                          <TempPill
-                            temp={st.temps[i] as "chilled" | "ambient"}
-                          />
+                          <TempPill temp={st.temps[i] as Temp} />
                           <span className="t-mono-sm text-fg-2">{id}</span>
                           {draft && (
                             <Button

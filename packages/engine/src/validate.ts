@@ -1,5 +1,5 @@
-import type { EngineInput, EngineOrder, PlannedTrip } from "./types";
-import { DEFAULT_SETTINGS } from "./types";
+import type { Deferral, EngineInput, EngineOrder, PlannedTrip } from "./types";
+import { DEFAULT_SETTINGS, requiresRefrigeration } from "./types";
 
 /*
  * Independent check of a finished plan against every operating constraint.
@@ -12,6 +12,8 @@ export interface Violation {
   rule:
     | "unknown"
     | "duplicate"
+    | "missing"
+    | "deferral"
     | "depot"
     | "temp"
     | "access"
@@ -32,6 +34,7 @@ const EPS = 1e-6;
 export function validatePlan(
   input: EngineInput,
   trips: PlannedTrip[],
+  deferrals: Pick<Deferral, "orderId" | "reason">[] = [],
 ): Violation[] {
   const settings = { ...DEFAULT_SETTINGS, ...input.settings };
   const orders = new Map(input.orders.map((o) => [o.id, o]));
@@ -106,10 +109,10 @@ export function validatePlan(
             vehicleId: vid,
             orderId: o.id,
           });
-        if (o.temp === "chilled" && v.temp !== "reefer")
+        if (requiresRefrigeration(o.temp) && v.temp !== "reefer")
           out.push({
             rule: "temp",
-            text: `${o.id} is chilled but ${vid} has no refrigeration`,
+            text: `${o.id} is ${o.temp} but ${vid} has no refrigeration`,
             vehicleId: vid,
             orderId: o.id,
           });
@@ -177,6 +180,34 @@ export function validatePlan(
         rule: "fuel",
         text: `${vid} needs ${Math.round(liters)} L; ${Math.round(v.weeklyQuotaL - v.fuelUsedL)} L left this week`,
         vehicleId: vid,
+      });
+  }
+  for (const d of deferrals) {
+    if (!orders.has(d.orderId))
+      out.push({
+        rule: "unknown",
+        text: `Unknown deferred order ${d.orderId}`,
+      });
+    if (seen.has(d.orderId))
+      out.push({
+        rule: "duplicate",
+        text: `${d.orderId} is assigned more than once`,
+        orderId: d.orderId,
+      });
+    seen.add(d.orderId);
+    if (!d.reason.trim())
+      out.push({
+        rule: "deferral",
+        text: `${d.orderId} is deferred without a reason`,
+        orderId: d.orderId,
+      });
+  }
+  for (const o of input.orders) {
+    if (o.depot === input.depot && !seen.has(o.id))
+      out.push({
+        rule: "missing",
+        text: `${o.id} is neither served nor deferred. Re-run the planner.`,
+        orderId: o.id,
       });
   }
   return out;

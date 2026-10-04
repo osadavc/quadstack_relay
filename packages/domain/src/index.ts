@@ -3,7 +3,10 @@ export * from "./time";
 
 export type Role = "dispatcher" | "loader" | "driver" | "store";
 export type Brand = "Fresh" | "Style" | "Tech";
-export type Temp = "chilled" | "ambient";
+export type Temp = "chilled" | "ambient" | "frozen";
+
+export const requiresRefrigeration = (temp: string) =>
+  temp === "chilled" || temp === "frozen";
 
 /** Orders for the next day close at 16:00 the day before. */
 export const CUTOFF = "16:00";

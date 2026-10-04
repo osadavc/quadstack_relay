@@ -1,6 +1,6 @@
 "use client";
 
-import { hhmm } from "@relay/domain";
+import { hhmm, TEMP_LABEL } from "@relay/domain";
 import {
   ArrowLeft,
   ChevronRight,
@@ -25,6 +25,7 @@ export const records = (n: number) => `${n} record${n === 1 ? "" : "s"}`;
 
 const UNIT_WORD: Record<string, [string, string]> = {
   chilled: ["chilled order", "chilled orders"],
+  frozen: ["frozen order", "frozen orders"],
   ambient: ["ambient order", "ambient orders"],
 };
 export const unitsLabel = (o: Pick<StopOrder, "unitCount" | "unitKind">) => {
@@ -32,7 +33,7 @@ export const unitsLabel = (o: Pick<StopOrder, "unitCount" | "unitKind">) => {
   return `${o.unitCount} ${o.unitCount === 1 ? one : many}`;
 };
 export const orderKind = (o: Pick<StopOrder, "temp" | "brand">) =>
-  o.temp === "chilled" ? "Chilled" : o.brand === "Fresh" ? "Ambient" : o.brand;
+  o.brand === "Fresh" ? TEMP_LABEL[o.temp] : o.brand;
 export const casesWord = (_o: Pick<StopOrder, "brand">) => "units";
 
 /** The main action at the foot of a screen: 46 px on a phone, 40 px from tablet up. */

@@ -1,5 +1,7 @@
 "use client";
 
+import { requiresRefrigeration, TEMP_LABEL } from "@relay/domain";
+
 import {
   ArrowLeft,
   Check,
@@ -352,9 +354,9 @@ function SectionCard({
         </p>
       </div>
       <span className="ml-auto" />
-      {section.temp === "chilled" ? (
+      {requiresRefrigeration(section.temp) ? (
         <Pill tone="chilled" icon={Snowflake}>
-          Chilled
+          {TEMP_LABEL[section.temp]}
         </Pill>
       ) : (
         <Pill tone="neutral" icon={Package}>

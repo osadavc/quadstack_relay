@@ -1,5 +1,7 @@
 "use client";
 
+import { TEMP_LABEL } from "@relay/domain";
+
 import {
   ArrowRight,
   CalendarCheck,
@@ -27,7 +29,11 @@ export function NoticeView({
   n: NonNullable<Awaited<ReturnType<typeof noticeView>>>;
 }) {
   const kind =
-    n.brand !== "Fresh" ? n.brand : n.temp === "chilled" ? "chilled" : "dry";
+    n.brand !== "Fresh"
+      ? n.brand
+      : n.temp === "ambient"
+        ? "dry"
+        : TEMP_LABEL[n.temp].toLowerCase();
   const next = n.nextRun ?? "the next run";
 
   if (!n.deferred) {

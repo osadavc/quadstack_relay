@@ -67,11 +67,11 @@ erDiagram
 
 | Table | Purpose |
 | --- | --- |
-| `orders` | One per outlet, delivery day and temperature (a Fresh outlet can have a chilled and an ambient order). Status: draft, confirmed, planned, loaded, delivered, received, failed. Channel: the store's app, or phoned in to dispatch. When a published plan defers an order it moves to the next run and keeps the day it was for, the run it moved to and the reason |
+| `orders` | One per outlet, delivery day and temperature (Fresh supports chilled, frozen and ambient orders). Status: draft, confirmed, planned, loaded, delivered, received, failed. Channel: the store's app, or phoned in to dispatch. When a published plan defers an order it moves to the next run and keeps the day it was for, the run it moved to and the reason |
 | `products` | What stores can order, kept by dispatch: code, name, brand, temperature, unit, weight and volume per unit, and whether it is still offered. Empty on a fresh install |
 | `order_lines` | One line per product ordered, with the product's figures copied on so later edits don't change it; or one line of totals where the brand has no products. Receipts and shortfalls count against lines |
 | `service_log` | Outcome of each past run per outlet and temperature. The fairness guard counts runs in a row where an outlet was skipped |
-| `plans` | One row per version and depot: draft, published or superseded. KPIs, the planner's stats, the best-case chilled volume and the list of manual edits |
+| `plans` | One row per version and depot: draft, published or superseded. KPIs, the planner's stats, the best-case refrigerated volume, input hash and the list of manual edits. The first draft closes that depot's queue |
 | `plan_trips`, `plan_stops` | The engine's trips (vehicle, trip 1 or 2, district, departure, last stop, return, km, litres, load) and timed stops |
 | `plan_assignments` | Every order in a plan: served on a trip, or deferred with a reason group and text, and whether a person must decide |
 | `decisions` | Fairness guard decisions with the options the engine checked (swap, redirect a trip, add to a vehicle, defer) and what the dispatcher chose, kept after they are resolved |

@@ -1,6 +1,6 @@
 "use client";
 
-import { tempsFor } from "@relay/domain";
+import { type Temp, tempsFor } from "@relay/domain";
 import {
   MoreHorizontal,
   Package,
@@ -361,7 +361,7 @@ function ProductForm({
     sku: existing?.sku ?? "",
     name: existing?.name ?? "",
     brand: (existing?.brand ?? "Fresh") as Brand,
-    temp: (existing?.temp ?? "chilled") as "chilled" | "ambient",
+    temp: (existing?.temp ?? "chilled") as Temp,
     unit: existing?.unit ?? "",
     weightKg: existing ? String(existing.weightKg) : "",
     volumeM3: existing ? String(existing.volumeM3) : "",
@@ -475,12 +475,15 @@ function ProductForm({
             ) : undefined
           }
         >
-          <Choice
+          <Choice<Temp>
             value={form.temp}
             onChange={(v) => set("temp", v)}
-            disabled={temps.includes("chilled") ? [] : ["chilled"]}
+            disabled={(["chilled", "frozen"] as Temp[]).filter(
+              (temp) => !temps.includes(temp),
+            )}
             options={[
               { value: "chilled", label: "Chilled" },
+              { value: "frozen", label: "Frozen" },
               { value: "ambient", label: "Ambient" },
             ]}
           />

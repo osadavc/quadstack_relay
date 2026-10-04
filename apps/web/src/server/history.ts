@@ -1,5 +1,5 @@
 import { type DBOrTx, schema as s } from "@relay/db";
-import { daysBetween } from "@relay/domain";
+import { daysBetween, type Temp } from "@relay/domain";
 import { inArray } from "drizzle-orm";
 
 /*
@@ -14,7 +14,7 @@ export interface OutletHistory {
   /** Most recent runs first: served | skipped. */
   runs: { day: string; outcome: "served" | "skipped" }[];
   /** Last day each kind of goods arrived. */
-  lastServed: Partial<Record<"chilled" | "ambient", string>>;
+  lastServed: Partial<Record<Temp, string>>;
   skippedDays: string[];
 }
 
@@ -53,7 +53,7 @@ export async function outletHistory(
     const lastServed: OutletHistory["lastServed"] = {};
     for (const r of list) {
       if (r.outcome !== "served") continue;
-      const t = r.temp as "chilled" | "ambient";
+      const t = r.temp;
       if (!lastServed[t] || r.day > (lastServed[t] as string))
         lastServed[t] = r.day;
     }
@@ -71,7 +71,7 @@ export async function outletHistory(
 
 export function daysSince(
   h: OutletHistory | undefined,
-  temp: "chilled" | "ambient",
+  temp: Temp,
   day: string,
 ) {
   const last = h?.lastServed[temp];

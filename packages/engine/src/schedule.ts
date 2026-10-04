@@ -7,6 +7,7 @@ import type {
   PlannedStop,
   PlannedTrip,
 } from "./types";
+import { requiresRefrigeration } from "./types";
 
 /*
  * Turning a set of orders on a vehicle into a timed plan.
@@ -64,7 +65,7 @@ export const allowanceFor = (ctx: Ctx, o: EngineOrder) =>
 export function legalFor(o: EngineOrder, v: EngineVehicle): Failure | null {
   if (o.depot !== v.depot)
     return { code: "depot", text: `${v.id} is based at ${v.depot}` };
-  if (o.temp === "chilled" && v.temp !== "reefer")
+  if (requiresRefrigeration(o.temp) && v.temp !== "reefer")
     return { code: "temp", text: `${v.id} has no refrigeration` };
   if (o.vanOnly && v.type !== "van")
     return { code: "access", text: "Van-only outlet, trucks can’t reach it" };
@@ -88,7 +89,7 @@ function stopsFor(ctx: Ctx, orders: EngineOrder[]): StopDraft[] {
     if (s) {
       s.orderIds.push(o.id);
       s.service += allowanceFor(ctx, o);
-      if (o.temp === "chilled") s.chilled = true;
+      if (requiresRefrigeration(o.temp)) s.chilled = true;
     } else {
       byOutlet.set(o.outletId, {
         outletId: o.outletId,
@@ -96,7 +97,7 @@ function stopsFor(ctx: Ctx, orders: EngineOrder[]): StopDraft[] {
         open: o.windowOpen,
         close: o.windowClose,
         service: allowanceFor(ctx, o),
-        chilled: o.temp === "chilled",
+        chilled: requiresRefrigeration(o.temp),
       });
     }
   }
@@ -314,7 +315,7 @@ export function evaluateVehicle(
       for (const o of draft.orders) {
         vol += o.volumeM3;
         wt += o.weightKg;
-        if (o.temp === "chilled") chilled += o.volumeM3;
+        if (requiresRefrigeration(o.temp)) chilled += o.volumeM3;
       }
       return {
         vehicleId: v.id,

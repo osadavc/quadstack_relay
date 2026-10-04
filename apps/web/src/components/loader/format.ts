@@ -8,6 +8,7 @@ export const plural = (n: number, one: string, many = `${one}s`) =>
 
 export const KIND_WORD: Record<string, [string, string]> = {
   chilled: ["chilled order", "chilled orders"],
+  frozen: ["frozen order", "frozen orders"],
   ambient: ["ambient order", "ambient orders"],
 };
 

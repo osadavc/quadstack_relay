@@ -9,6 +9,7 @@ import {
   hhmm,
   minutesBetween,
   orderIdFor,
+  requiresRefrigeration,
   stamp,
   tempsFor,
   weekday,
@@ -79,7 +80,7 @@ export async function storeHeader(user: User) {
 export async function orderForm(user: User) {
   const outlet = await outletFor(user);
   const t = now();
-  const day = await orderingDay();
+  const day = await orderingDay(db, outlet.depot);
   const cutoff = cutoffFor(day);
   const temps = tempsFor(outlet.brand);
 
@@ -261,6 +262,8 @@ export async function orderForm(user: User) {
       day: dayLabel(d),
       chilled:
         runs.find((r) => r.day === d && r.temp === "chilled")?.outcome ?? null,
+      frozen:
+        runs.find((r) => r.day === d && r.temp === "frozen")?.outcome ?? null,
       ambient:
         runs.find((r) => r.day === d && r.temp === "ambient")?.outcome ?? null,
     })),
@@ -312,7 +315,7 @@ export async function todayView(user: User) {
   // Orders still on this delivery first, chilled before dry; moved ones last.
   const rank = (st: OrderStory) =>
     (st.order.deliveryDay === day ? 0 : 2) +
-    (st.order.temp === "chilled" ? 0 : 1);
+    (requiresRefrigeration(st.order.temp) ? 0 : 1);
   const list = [...stories.values()].sort((a, b) => rank(a) - rank(b));
   const items = list.map((st) => {
     const status = statusOf(st, day);
@@ -632,7 +635,11 @@ export async function recordView(user: User, orderId: string) {
     evidence.push({
       kind: "temp",
       title: `Probe at handover ${stop.tempC.toFixed(1)} °C`,
-      meta: stop.tempC <= 5 ? "Within 0 to 5 °C" : "Above 5 °C",
+      meta: all.some((st) => st.order.temp === "frozen")
+        ? "Recorded for a delivery containing frozen goods"
+        : stop.tempC <= 5
+          ? "Within 0 to 5 °C"
+          : "Above 5 °C",
     });
   for (const st of all)
     if (st.receipt?.photoId)

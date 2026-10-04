@@ -5,7 +5,9 @@
  */
 
 export type Brand = "Fresh" | "Style" | "Tech";
-export type Temp = "chilled" | "ambient";
+export type Temp = "chilled" | "ambient" | "frozen";
+export const requiresRefrigeration = (temp: Temp) =>
+  temp === "chilled" || temp === "frozen";
 export type DockType = "rear_dock" | "street" | "mall_bay";
 export type VehicleType = "truck" | "van";
 export type VehicleTemp = "reefer" | "ambient";
@@ -135,6 +137,7 @@ export interface PlannedTrip {
   liters: number;
   volumeM3: number;
   weightKg: number;
+  /** Refrigerated volume, including chilled and frozen goods. */
   chilledM3: number;
 }
 

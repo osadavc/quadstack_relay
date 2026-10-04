@@ -14,6 +14,7 @@ import type {
   Deferral,
   EngineOrder,
 } from "./types";
+import { requiresRefrigeration } from "./types";
 
 /*
  * The fairness guard. When the plan would skip an outlet for a second run in
@@ -60,11 +61,15 @@ function redirectOptions(
     .sort(
       (a, b) =>
         Number(b.consecutiveSkips > 0) - Number(a.consecutiveSkips > 0) ||
-        Number(b.temp === "chilled") - Number(a.temp === "chilled") ||
+        Number(requiresRefrigeration(b.temp)) -
+          Number(requiresRefrigeration(a.temp)) ||
         b.volumeM3 - a.volumeM3,
     );
   const chilledOf = (list: EngineOrder[]) =>
-    list.reduce((a, o) => a + (o.temp === "chilled" ? o.volumeM3 : 0), 0);
+    list.reduce(
+      (a, o) => a + (requiresRefrigeration(o.temp) ? o.volumeM3 : 0),
+      0,
+    );
   const outletsOf = (list: EngineOrder[]) =>
     [...new Set(list.map((o) => o.outletId))].join(", ");
 

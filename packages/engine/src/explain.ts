@@ -2,6 +2,7 @@ import { type Ctx, evaluateVehicle, type Failure, legalFor } from "./schedule";
 import type { PlanState } from "./state";
 import { toHHMM } from "./time";
 import type { DeferralGroup, EngineOrder } from "./types";
+import { requiresRefrigeration } from "./types";
 
 /*
  * Why an order could not be placed, in words a store manager can read.
@@ -75,10 +76,9 @@ export function explainDeferral(
     if (o.vanOnly)
       return {
         group: "van",
-        reason:
-          o.temp === "chilled"
-            ? "Van-only outlet · no reefer van at this depot"
-            : "Van-only outlet · no van at this depot",
+        reason: requiresRefrigeration(o.temp)
+          ? "Van-only outlet · no reefer van at this depot"
+          : "Van-only outlet · no van at this depot",
       };
     return {
       group: "capacity",
@@ -124,7 +124,7 @@ export function explainDeferral(
     )[0];
 
   if (o.vanOnly) {
-    const kind = o.temp === "chilled" ? "reefer van" : "van";
+    const kind = requiresRefrigeration(o.temp) ? "reefer van" : "van";
     const n = legal.length;
     return {
       group: "van",
@@ -134,7 +134,7 @@ export function explainDeferral(
     };
   }
 
-  if (o.temp === "chilled") {
+  if (requiresRefrigeration(o.temp)) {
     return {
       group: "reefer",
       reason: fullTrip
