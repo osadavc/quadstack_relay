@@ -1,6 +1,11 @@
 "use client";
 
-import { DOCK_LABEL, hhmm, windowLabel } from "@relay/domain";
+import {
+  DOCK_LABEL,
+  hhmm,
+  requiresRefrigeration,
+  windowLabel,
+} from "@relay/domain";
 import {
   ArrowLeft,
   CircleCheck,
@@ -327,13 +332,13 @@ export function StopView({ seq }: { seq: number }) {
                 <span
                   className={cx(
                     "flex size-10 shrink-0 items-center justify-center rounded-xl",
-                    o.temp === "chilled"
+                    requiresRefrigeration(o.temp)
                       ? "bg-chilled-tint text-chilled-text"
                       : "bg-subtle text-fg-2",
                   )}
                   aria-hidden
                 >
-                  {o.temp === "chilled" ? (
+                  {requiresRefrigeration(o.temp) ? (
                     <Snowflake size={20} strokeWidth={1.7} />
                   ) : (
                     <Package size={20} strokeWidth={1.7} />

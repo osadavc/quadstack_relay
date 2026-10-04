@@ -1,5 +1,7 @@
 "use client";
 
+import { requiresRefrigeration, TEMP_LABEL, type Temp } from "@relay/domain";
+
 import { Package, Search, Snowflake } from "lucide-react";
 import { type ReactNode, useSyncExternalStore } from "react";
 import { Dialog, PhoneSheet } from "@/components/interact";
@@ -106,10 +108,10 @@ export function BrandDot({
 }
 
 /* Chilled or ambient load. */
-export function TempPill({ temp }: { temp: "chilled" | "ambient" }) {
-  return temp === "chilled" ? (
+export function TempPill({ temp }: { temp: Temp }) {
+  return requiresRefrigeration(temp) ? (
     <Pill tone="chilled" icon={Snowflake} size="sm">
-      Chilled
+      {TEMP_LABEL[temp]}
     </Pill>
   ) : (
     <Pill tone="neutral" icon={Package} size="sm">

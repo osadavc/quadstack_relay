@@ -1,5 +1,7 @@
 "use client";
 
+import { requiresRefrigeration, TEMP_LABEL } from "@relay/domain";
+
 import {
   ArrowRight,
   CalendarClock,
@@ -147,7 +149,7 @@ export function OrderForm({ data }: { data: Data }) {
     return !(num(d.weightKg) > 0) || !(num(d.volumeM3) > 0);
   });
   const kindOf = (temp: string) =>
-    temp === "chilled" ? "Chilled" : brand === "Fresh" ? "Ambient" : brand;
+    brand === "Fresh" ? TEMP_LABEL[temp] : brand;
 
   const copyLast = () =>
     setDraft((d) => {
@@ -488,6 +490,15 @@ export function OrderForm({ data }: { data: Data }) {
                         {r.chilled === "served" ? "Chilled" : "Chilled skipped"}
                       </Pill>
                     )}
+                    {r.frozen && (
+                      <Pill
+                        tone={r.frozen === "served" ? "success" : "warning"}
+                        icon={r.frozen === "served" ? Check : undefined}
+                        size="sm"
+                      >
+                        {r.frozen === "served" ? "Frozen" : "Frozen skipped"}
+                      </Pill>
+                    )}
                     {r.ambient && (
                       <Pill
                         tone={r.ambient === "served" ? "success" : "warning"}
@@ -555,7 +566,7 @@ function OrderSection({
       <div
         className={cx(
           "flex items-center gap-2.5 px-[18px] py-3.5 max-md:px-4",
-          sec.temp === "chilled" ? "bg-chilled-tint" : "bg-subtle",
+          requiresRefrigeration(sec.temp) ? "bg-chilled-tint" : "bg-subtle",
         )}
       >
         <TempTag temp={sec.temp} />

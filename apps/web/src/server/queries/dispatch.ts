@@ -12,6 +12,7 @@ import {
   minutesBetween,
   minutesOf,
   plural,
+  requiresRefrigeration,
   stamp,
   weekday,
 } from "@relay/domain";
@@ -161,7 +162,8 @@ export async function ordersQueue(depot: string) {
 
   const fresh = rows.filter((r) => r.brand === "Fresh");
   const cutoff = cutoffFor(ops.day);
-  const closed = cmpOps(ops.clock, cutoff) >= 0;
+  const closed =
+    cmpOps(ops.clock, cutoff) >= 0 || Boolean(await latestPlan(ops.day, depot));
   const minutesLeft = Math.max(0, minutesBetween(ops.clock, cutoff));
   // "16:00" when orders close today, "Sun 16:00" when they close on another day.
   const closesAt =
@@ -192,13 +194,13 @@ export async function ordersQueue(depot: string) {
     summary: {
       fresh: fresh.length,
       freshAmbient: fresh.filter((r) => r.temp === "ambient").length,
-      freshChilled: fresh.filter((r) => r.temp === "chilled").length,
+      freshChilled: fresh.filter((r) => requiresRefrigeration(r.temp)).length,
       style: rows.filter((r) => r.brand === "Style").length,
       tech: rows.filter((r) => r.brand === "Tech").length,
       volume: rows.reduce((a, r) => a + r.volumeM3, 0),
       weight: rows.reduce((a, r) => a + r.weightKg, 0),
       chilled: rows
-        .filter((r) => r.temp === "chilled")
+        .filter((r) => requiresRefrigeration(r.temp))
         .reduce((a, r) => a + r.volumeM3, 0),
       skipped: new Set(rows.filter((r) => r.skips > 0).map((r) => r.outletId))
         .size,
@@ -542,7 +544,7 @@ export async function planBoard(depot: string) {
       bestCase: plan.bestCaseChilledM3 ?? kpis.chilledPlannedM3,
       stats: plan.stats as { ms: number; iterations: number },
       deferredChilledM3: deferred
-        .filter((d) => d.temp === "chilled")
+        .filter((d) => requiresRefrigeration(d.temp))
         .reduce((a, d) => a + d.volumeM3, 0),
       vehiclesWithTrips: new Set(trips.map((t) => t.vehicleId)).size,
     },

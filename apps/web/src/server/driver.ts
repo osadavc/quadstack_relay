@@ -7,6 +7,7 @@ import {
   normalizeOps,
   opsAt,
   plural,
+  TEMP_LABEL,
 } from "@relay/domain";
 import { and, asc, desc, eq, inArray, ne, or } from "drizzle-orm";
 import { z } from "zod";
@@ -526,7 +527,7 @@ async function applyOne(tx: Tx, user: User, r: DriverRecord, sentAt: string) {
         .where(inArray(s.orders.id, stop.orderIds));
       const parts = orders.map(
         (o) =>
-          `${counts[o.id]} ${o.temp === "chilled" ? "chilled" : o.brand === "Fresh" ? "ambient" : "units"}`,
+          `${counts[o.id]} ${o.brand === "Fresh" ? TEMP_LABEL[o.temp].toLowerCase() : "units"}`,
       );
       await logEvent(tx, {
         at,

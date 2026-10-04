@@ -1,5 +1,7 @@
 "use client";
 
+import { requiresRefrigeration } from "@relay/domain";
+
 import { ArrowUpRight, DoorOpen } from "lucide-react";
 import { Card, cx } from "@/components/ui";
 import { kindCount, m3, type Section } from "./format";
@@ -39,18 +41,16 @@ export function LoadMap({
             const done = z.units.filter((u) => u.status !== "pending").length;
             const share = z.units.length ? done / z.units.length : 0;
             const full = share === 1;
-            const fill =
-              z.temp === "chilled"
-                ? "bg-chilled-tint"
-                : z.stopSeq === firstStopSeq
-                  ? "bg-fresh-tint"
-                  : "bg-muted";
-            const mono =
-              z.temp === "chilled"
-                ? "text-chilled-text"
-                : z.stopSeq === firstStopSeq
-                  ? "text-fresh"
-                  : "text-fg-2";
+            const fill = requiresRefrigeration(z.temp)
+              ? "bg-chilled-tint"
+              : z.stopSeq === firstStopSeq
+                ? "bg-fresh-tint"
+                : "bg-muted";
+            const mono = requiresRefrigeration(z.temp)
+              ? "text-chilled-text"
+              : z.stopSeq === firstStopSeq
+                ? "text-fresh"
+                : "text-fg-2";
             return (
               <div
                 key={`${z.stopSeq}-${z.temp}`}

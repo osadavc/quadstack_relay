@@ -11,6 +11,7 @@ export {
   moveOptions,
   type VehicleCheck,
 } from "./edit";
+export { planningInputKey } from "./input-key";
 export { mulberry32, round1, round2, toHHMM, toMinutes } from "./time";
 export * from "./types";
 export { type Violation, validatePlan } from "./validate";

@@ -1,5 +1,5 @@
 import { db, schema as s } from "@relay/db";
-import { plural } from "@relay/domain";
+import { plural, requiresRefrigeration } from "@relay/domain";
 import { and, eq, inArray } from "drizzle-orm";
 import type { User } from "./auth";
 import { cutoffFor, now, orderingDay, touch } from "./clock";
@@ -28,12 +28,12 @@ export { cutoffFor };
 export async function placeOrder(user: User, items: OrderItem[]) {
   const outletId = outletOf(user);
   return db.transaction(async (tx) => {
-    const day = await orderingDay(tx);
+    const at = await touch(tx);
     const [outlet] = await tx
       .select()
       .from(s.outlets)
       .where(eq(s.outlets.id, outletId));
-    const at = await touch(tx);
+    const day = await orderingDay(tx, outlet.depot);
     const placed = await saveOrders(tx, {
       outlet,
       day,
@@ -145,7 +145,7 @@ export async function confirmReceipt(
       actor: user,
       text:
         gap === 0
-          ? `Confirmed all ${received} ${order.temp === "chilled" ? "chilled " : ""}units of ${orderId} received`
+          ? `Confirmed all ${received} ${requiresRefrigeration(order.temp) ? `${order.temp} ` : ""}units of ${orderId} received`
           : `Confirmed ${received} of ${expected} units of ${orderId} received${note?.trim() ? `: “${note.trim()}”` : ""}${photoId ? ". Photo added" : ""}`,
       orderId,
       outletId,

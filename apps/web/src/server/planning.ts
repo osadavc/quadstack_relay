@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   type DBOrTx,
   db,
@@ -11,6 +12,7 @@ import {
   dayLabel,
   dowOf,
   plural,
+  requiresRefrigeration,
   toMinutes,
 } from "@relay/domain";
 import {
@@ -23,6 +25,7 @@ import {
   type PlanResult,
   type PolicyId,
   plan,
+  planningInputKey,
   validatePlan,
 } from "@relay/engine";
 import { and, asc, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
@@ -42,6 +45,9 @@ import { logEvent, notify } from "./record";
  */
 
 export class PlanError extends Error {}
+
+const inputHash = (input: EngineInput) =>
+  createHash("sha256").update(planningInputKey(input)).digest("hex");
 
 export const POLICY_LABEL: Record<PolicyId, string> = {
   fairness: "Fairness first",
@@ -286,6 +292,7 @@ async function storePlan(
       kpis: result.kpis,
       bestCaseChilledM3: bestCase,
       stats: result.stats,
+      inputHash: inputHash(input),
       edits,
     })
     .returning({ id: s.plans.id });
@@ -466,6 +473,7 @@ export async function decide(
   choice: DecisionChoice,
 ) {
   return db.transaction(async (tx) => {
+    const at = await touch(tx);
     const [d] = await tx
       .select()
       .from(s.decisions)
@@ -475,7 +483,6 @@ export async function decide(
     if (!d.planId) throw new PlanError("This decision has no plan.");
     const p = await draftPlan(tx, d.planId);
     const detail = d.detail as Decision;
-    const at = await touch(tx);
     const who = await outletLabel(tx, d.orderId);
     let summary = "";
 
@@ -572,9 +579,9 @@ export async function moveOrder(
   target: { vehicleId: string } | { defer: string },
 ) {
   return db.transaction(async (tx) => {
+    const at = await touch(tx);
     const p = await draftPlan(tx, planId);
     const input = await engineInput(tx, p.day, p.depot, p.policy as PolicyId);
-    const at = await touch(tx);
     const who = await outletLabel(tx, orderId);
     let text: string;
     if ("vehicleId" in target) {
@@ -609,8 +616,8 @@ export async function moveOrder(
 /** Put a moved or deferred order back in the planner's hands. */
 export async function releasePin(user: User, planId: string, orderId: string) {
   return db.transaction(async (tx) => {
-    const p = await draftPlan(tx, planId);
     const at = await touch(tx);
+    const p = await draftPlan(tx, planId);
     await tx
       .delete(s.pins)
       .where(and(eq(s.pins.day, p.day), eq(s.pins.orderId, orderId)));
@@ -678,6 +685,8 @@ async function unitsFor(
 
 export async function publishPlan(user: User, planId: string) {
   return db.transaction(async (tx) => {
+    // Serialize with order, vehicle and planning writes before checking inputs.
+    const at = await touch(tx);
     const p = await draftPlan(tx, planId);
     const pending = await tx
       .select({ id: s.decisions.id })
@@ -691,6 +700,14 @@ export async function publishPlan(user: User, planId: string) {
       );
 
     const input = await engineInput(tx, p.day, p.depot, p.policy as PolicyId);
+    if (!p.inputHash || p.inputHash !== inputHash(input))
+      throw new PlanError(
+        "Orders or operating constraints changed since this draft. Re-run the planner before publishing.",
+      );
+    const assignments = await tx
+      .select()
+      .from(s.planAssignments)
+      .where(eq(s.planAssignments.planId, planId));
     const trips = await tx
       .select()
       .from(s.planTrips)
@@ -710,6 +727,19 @@ export async function publishPlan(user: User, planId: string) {
       .orderBy(asc(s.planStops.seq));
     const stopsOf = (tripId: string) =>
       stops.filter((st) => st.tripId === tripId);
+
+    if (
+      assignments.length !== input.orders.length ||
+      assignments.some((a) =>
+        a.status === "served"
+          ? !a.tripId ||
+            !stopsOf(a.tripId).some((st) => st.orderIds.includes(a.orderId))
+          : a.status !== "deferred" || a.tripId !== null,
+      )
+    )
+      throw new PlanError(
+        "Every order must be served on its assigned trip or deferred with a reason. Re-run the planner.",
+      );
 
     // The independent validator has the last word before anything goes out.
     const violations = validatePlan(
@@ -739,13 +769,15 @@ export async function publishPlan(user: User, planId: string) {
         weightKg: t.weightKg,
         chilledM3: t.chilledM3,
       })),
+      assignments
+        .filter((a) => a.status === "deferred")
+        .map((a) => ({ orderId: a.orderId, reason: a.reason ?? "" })),
     );
     if (violations.length)
       throw new PlanError(
         `The plan breaks a rule: ${violations[0].text}. Re-run the planner.`,
       );
 
-    const at = await touch(tx);
     await tx
       .update(s.plans)
       .set({ status: "superseded" })
@@ -957,10 +989,6 @@ export async function publishPlan(user: User, planId: string) {
       );
 
     // Orders, the service record, and what every store is told.
-    const assignments = await tx
-      .select()
-      .from(s.planAssignments)
-      .where(eq(s.planAssignments.planId, planId));
     const nextRun = await nextOperatingDay(tx, p.day);
     const etaOf = new Map<string, { eta: number; vehicleId: string }>();
     for (const t of trips)
@@ -973,12 +1001,11 @@ export async function publishPlan(user: User, planId: string) {
       const o = input.orders.find((x) => x.id === a.orderId);
       if (!o) continue;
       const out = outlets.get(o.outletId);
-      const kind =
-        o.temp === "chilled"
-          ? "chilled"
-          : o.brand === "Fresh"
-            ? "dry"
-            : o.brand.toLowerCase();
+      const kind = requiresRefrigeration(o.temp)
+        ? o.temp
+        : o.brand === "Fresh"
+          ? "dry"
+          : o.brand.toLowerCase();
       if (a.status === "served") {
         const e = etaOf.get(o.id);
         await tx

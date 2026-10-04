@@ -1,6 +1,6 @@
 "use client";
 
-import { hhmm } from "@relay/domain";
+import { hhmm, requiresRefrigeration, TEMP_LABEL } from "@relay/domain";
 import {
   ArrowLeft,
   Camera,
@@ -47,9 +47,9 @@ async function compress(file: File): Promise<string> {
   }
 }
 
-/** Step a probe reading by 0.1 °C; the first tap starts from 4.0 °C. */
-const bumpTemp = (t: number | null, d: number) =>
-  t == null ? 4 : Math.round((t + d) * 10) / 10;
+/** Step a probe reading by 0.1 °C, starting from the recorded reefer reading. */
+const bumpTemp = (t: number | null, d: number, initial: number) =>
+  t == null ? initial : Math.round((t + d) * 10) / 10;
 
 function countNote(o: StopOrder, n: number) {
   if (n === o.loaded)
@@ -57,7 +57,7 @@ function countNote(o: StopOrder, n: number) {
       ok: true,
       text: o.shortfall
         ? `Matches the dock record (${o.shortfall.cases} short)`
-        : o.temp === "chilled"
+        : requiresRefrigeration(o.temp)
           ? "Matches the load sheet"
           : "All handed over",
     };
@@ -121,7 +121,10 @@ export function HandoverView({ seq }: { seq: number }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const run = view.run;
   const stop = run?.stops.find((s) => s.seq === seq);
-  const hasChilled = Boolean(stop?.orders.some((o) => o.temp === "chilled"));
+  const hasChilled = Boolean(
+    stop?.orders.some((o) => requiresRefrigeration(o.temp)),
+  );
+  const hasFrozen = Boolean(stop?.orders.some((o) => o.temp === "frozen"));
 
   // Start the draft from what left the dock.
   useEffect(() => {
@@ -166,7 +169,7 @@ export function HandoverView({ seq }: { seq: number }) {
     const summary = stop.orders
       .map(
         (o) =>
-          `${counts[o.id] ?? o.loaded} ${o.temp === "chilled" ? "chilled" : o.brand === "Fresh" ? "ambient" : casesWord(o)}`,
+          `${counts[o.id] ?? o.loaded} ${o.brand === "Fresh" ? TEMP_LABEL[o.temp].toLowerCase() : casesWord(o)}`,
       )
       .join(", ");
     record("complete", {
@@ -352,7 +355,7 @@ export function HandoverView({ seq }: { seq: number }) {
               <span
                 className={cx(
                   "truncate t-caption",
-                  temp != null && temp > 5 && !done
+                  temp != null && temp > 5 && !hasFrozen && !done
                     ? "text-warning-text"
                     : "text-fg-3",
                 )}
@@ -361,9 +364,11 @@ export function HandoverView({ seq }: { seq: number }) {
                   ? "On the record"
                   : temp == null
                     ? "Not taken"
-                    : temp <= 5
-                      ? "Probe · in range"
-                      : "Probe · too warm"}
+                    : hasFrozen
+                      ? "Probe recorded · frozen goods"
+                      : temp <= 5
+                        ? "Probe · in range"
+                        : "Probe · too warm"}
               </span>
             </span>
             {!done && (
@@ -371,7 +376,11 @@ export function HandoverView({ seq }: { seq: number }) {
                 <button
                   type="button"
                   aria-label="Probe reading up"
-                  onClick={() => setDraft(seq, { tempC: bumpTemp(temp, 0.1) })}
+                  onClick={() =>
+                    setDraft(seq, {
+                      tempC: bumpTemp(temp, 0.1, run.reeferTempC ?? 0),
+                    })
+                  }
                   className="flex size-6 items-center justify-center rounded-md bg-subtle text-fg hover:bg-muted"
                 >
                   <Plus size={12} strokeWidth={2} aria-hidden />
@@ -379,7 +388,11 @@ export function HandoverView({ seq }: { seq: number }) {
                 <button
                   type="button"
                   aria-label="Probe reading down"
-                  onClick={() => setDraft(seq, { tempC: bumpTemp(temp, -0.1) })}
+                  onClick={() =>
+                    setDraft(seq, {
+                      tempC: bumpTemp(temp, -0.1, run.reeferTempC ?? 0),
+                    })
+                  }
                   className="flex size-6 items-center justify-center rounded-md bg-subtle text-fg hover:bg-muted"
                 >
                   <Minus size={12} strokeWidth={2} aria-hidden />

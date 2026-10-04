@@ -1,5 +1,7 @@
 "use client";
 
+import { TEMP_LABEL } from "@relay/domain";
+
 import {
   ArrowRight,
   CalendarClock,
@@ -232,8 +234,8 @@ export function TodayView({
 
       <section className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4">
         <h2 className="flex items-center gap-2 t-caption-m text-fg-3">
-          {main.temp === "chilled"
-            ? "Chilled order"
+          {main.temp !== "ambient"
+            ? `${TEMP_LABEL[main.temp]} order`
             : main.brand === "Fresh"
               ? "Dry order"
               : "Order"}{" "}

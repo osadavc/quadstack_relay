@@ -8,6 +8,7 @@ import {
   m3,
   minutesOf,
   plural,
+  requiresRefrigeration,
   windowLabel,
 } from "@relay/domain";
 import {
@@ -494,8 +495,8 @@ function StopRow({
           {stop.orders.map((o) => (
             <Pill
               key={o.id}
-              tone={o.temp === "chilled" ? "chilled" : "neutral"}
-              icon={o.temp === "chilled" ? Snowflake : Package}
+              tone={requiresRefrigeration(o.temp) ? "chilled" : "neutral"}
+              icon={requiresRefrigeration(o.temp) ? Snowflake : Package}
             >
               {unitsLabel(o)}
             </Pill>

@@ -15,6 +15,13 @@
       "when": 1791049782844,
       "tag": "0001_products",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791101728681,
+      "tag": "0002_operating_constraints",
+      "breakpoints": true
     }
   ]
 }

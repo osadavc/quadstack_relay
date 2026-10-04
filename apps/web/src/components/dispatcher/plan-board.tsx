@@ -49,7 +49,7 @@ const POLICIES = [
   {
     value: "fill",
     label: "Fill reefers first",
-    detail: "Most chilled volume before 08:00",
+    detail: "Most refrigerated volume before 08:00",
   },
   {
     value: "routes",
@@ -453,13 +453,13 @@ function Kpis({ board, plan }: { board: Board; plan: Plan }) {
         <p className="flex items-baseline gap-1.5 whitespace-nowrap">
           <span className="t-numeric">{k.chilledPlannedM3.toFixed(1)} m³</span>
           <span className="t-small text-fg-3">
-            of {k.chilledDemandM3.toFixed(1)} m³ chilled demand
+            of {k.chilledDemandM3.toFixed(1)} m³ refrigerated demand
           </span>
         </p>
         <div
           className="relative h-3.5 w-full"
           role="img"
-          aria-label={`${k.chilledPlannedM3.toFixed(1)} of ${k.chilledDemandM3.toFixed(1)} m³ chilled planned, best case ${plan.bestCase.toFixed(1)} m³`}
+          aria-label={`${k.chilledPlannedM3.toFixed(1)} of ${k.chilledDemandM3.toFixed(1)} m³ refrigerated planned, best case ${plan.bestCase.toFixed(1)} m³`}
         >
           <span className="absolute top-[3px] left-0 h-2 w-full rounded-[4px] bg-muted" />
           <span
@@ -712,7 +712,7 @@ function Timeline({
                               size={11}
                               strokeWidth={2}
                               className="shrink-0 text-chilled-text"
-                              aria-label="Chilled"
+                              aria-label="Refrigerated"
                             />
                           )}
                           <span className="truncate">
@@ -822,7 +822,7 @@ function LaneList({
                       size={12}
                       strokeWidth={2}
                       className="shrink-0 text-chilled-text"
-                      aria-label="Chilled"
+                      aria-label="Refrigerated"
                     />
                   )}
                   <span className="truncate">
@@ -910,7 +910,17 @@ function TripTable({
                       </span>
                     </td>
                     <td className="px-2">
-                      <TempPill temp={trip.chilled ? "chilled" : "ambient"} />
+                      <div className="flex flex-wrap gap-1">
+                        {(["chilled", "frozen", "ambient"] as const)
+                          .filter((temp) =>
+                            trip.stops.some((stop) =>
+                              stop.temps.includes(temp),
+                            ),
+                          )
+                          .map((temp) => (
+                            <TempPill key={temp} temp={temp} />
+                          ))}
+                      </div>
                     </td>
                     <td className="px-2 t-mono-sm whitespace-nowrap text-fg-2">
                       {clock(trip.depart)} · {clock(trip.lastServiceEnd)} ·{" "}
@@ -972,7 +982,7 @@ function DeferralLedger({
           </div>
           {count > 0 && (
             <p className="t-caption text-fg-3">
-              {plan.deferredChilledM3.toFixed(1)} m³ chilled moves to{" "}
+              {plan.deferredChilledM3.toFixed(1)} m³ refrigerated moves to{" "}
               {"nextRunLabel" in board ? board.nextRunLabel : "the next run"}
             </p>
           )}

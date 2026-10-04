@@ -91,7 +91,7 @@ The two depots are the ones these files name.
 - Nothing from the Training or Test Data folders.
 - No product catalogue, no outlet names, and no orders.
 
-An order is what the booklet describes: one per outlet, day and temperature (chilled and ambient for Fresh, ambient for Style and Tech). Every vehicle has a weight and a volume limit, so each order carries its total units, weight and volume. Stores place orders in the app, and dispatch enters the ones that are phoned in.
+Orders are captured per outlet, day and temperature (chilled, frozen and ambient for Fresh, ambient for Style and Tech). Every vehicle has a weight and a volume limit, so each order carries its total units, weight and volume. Stores place orders in the app, and dispatch enters the ones that are phoned in.
 
 ## Products
 
@@ -108,7 +108,7 @@ Where a brand has products for a temperature, the store's order form and dispatc
 Plans follow the constraints the booklet sets:
 
 - weight and volume limits;
-- refrigeration for chilled goods;
+- refrigeration for chilled and frozen goods;
 - van-only and mall access;
 - delivery windows, with Fresh before 08:00;
 - up to two trips per vehicle per day;
@@ -131,6 +131,7 @@ Times in Relay are real Asia/Colombo time. A fresh install has no orders, so a d
 **2. Plan** · dispatcher
 
 - *Orders* shows the working day's queue, with each outlet's recent service.
+- **Close orders and plan** closes the queue for that depot. Subsequent store and phone orders go to the next open operating run; other depots stay open until their cutoff or their own planning step.
 - **Plan these orders** runs the planner in well under a second. The draft shows what is served, what is deferred and why, and the cold-chain fill.
 - Open any trip to see its stops, load and fuel. **Move or defer** checks every vehicle and names the rule that blocks the ones that can't take an order.
 - **Second skips.** If an outlet skipped on the last run would be skipped again, the plan holds for a decision. The engine has already checked the options: swap, send a reefer's trip there instead, add to another vehicle, or defer again with a reason.
@@ -138,6 +139,7 @@ Times in Relay are real Asia/Colombo time. A fresh install has no orders, so a d
 **3. Publish** · dispatcher
 
 - Publishing hands the trips to the dock and the drivers, and tells every store when its order arrives or why it moved.
+- If orders or operating constraints have changed since the draft, publishing asks you to re-run the planner. Every current order must be served on its assigned trip or deferred with a reason.
 - Deferred orders move to the next run with their reason.
 
 **4. Load** · loader
@@ -171,7 +173,7 @@ Times in Relay are real Asia/Colombo time. A fresh install has no orders, so a d
 | Loader | Dock queue; load sheet in reverse stop order with a load map, on a phone too; shortfall report before departure; release with seal and reefer temperature, QR and code handover; plan changes highlighted per truck |
 | Driver | Offline-first app: run with arrival bands, arrival, proof of delivery (counts, photo, probe temperature, signature), outbox, sync and reconcile, problem reports, messages from dispatch, location heartbeat |
 | Store manager | Order before the cutoff, deferral notice, arrival window and handoff trail, receipt count with notes and photo, delivery record, issues, notifications |
-| Engine | Capacity, refrigeration, van and mall access, delivery windows, two trips a day, weekly fuel quota, home depot, workshop vehicles; three policies; reasons for every deferral; fairness guard; stable re-runs; independent validator; 16 tests |
+| Engine | Capacity, refrigeration for chilled and frozen goods, van and mall access, delivery windows, two trips a day, weekly fuel quota, home depot, workshop vehicles; three policies; reasons for every deferral; fairness guard; stable re-runs; independent validator; 21 tests |
 
 ## Departures from the Designathon submission
 
@@ -215,5 +217,9 @@ cd apps/web && bun scripts/check-flow.ts --reset    # the whole flow through the
 - load, shortfall and release;
 - accept, then an offline handover;
 - the store's receipt, sync and reconciliation.
+
+The publishing and order-closure regressions can also be checked on an **empty, disposable database**. Apply the migrations first, then run `bun scripts/check-constraints.ts` from `apps/web`, setting both `DATABASE_URL` and `CONSTRAINT_CHECK_DATABASE_URL` to that database. The script refuses a database with existing reference data and does not wipe anything.
+
+Migration `0002_operating_constraints` adds frozen temperatures and the draft's input hash. `docker compose up --build` applies it through the setup job; an existing draft created before this migration needs to be re-run before publishing.
 
 The datasets are competition data. Keep the repository private and share it with the judges.

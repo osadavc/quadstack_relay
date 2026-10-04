@@ -202,7 +202,7 @@ export async function loadSheet(runId: string) {
     .sort((a, b) => b.seq - a.seq)
     .flatMap((st) => {
       const stopUnits = units.filter((u) => u.stopSeq === st.seq);
-      const temps = ["ambient", "chilled"] as const;
+      const temps = ["ambient", "chilled", "frozen"] as const;
       // Within a stop, chilled goods go last so they are at the doors.
       return temps
         .map((temp) => ({
