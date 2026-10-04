@@ -67,7 +67,7 @@ export async function phoneOrderView(depot: string) {
     .from(s.outlets)
     .where(eq(s.outlets.depot, depot))
     .orderBy(asc(s.outlets.id));
-  const day = await orderingDay();
+  const day = await orderingDay(db, depot);
   const products = await db
     .select()
     .from(s.products)
@@ -222,13 +222,13 @@ export async function createPhoneOrder(
   items: OrderItem[],
 ) {
   return db.transaction(async (tx) => {
+    const at = await touch(tx);
     const [outlet] = await tx
       .select()
       .from(s.outlets)
       .where(eq(s.outlets.id, outletId));
     if (!outlet) throw new AdminError("Unknown outlet");
-    const day = await orderingDay(tx);
-    const at = await touch(tx);
+    const day = await orderingDay(tx, outlet.depot);
     const placed = await saveOrders(tx, {
       outlet,
       day,

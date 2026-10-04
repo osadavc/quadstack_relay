@@ -1,14 +1,16 @@
 "use client";
 
+import { requiresRefrigeration, TEMP_LABEL } from "@relay/domain";
+
 import { Minus, Package, Plus, Snowflake } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { cx, Pill } from "@/components/ui";
 
 /* Temperature tag used on order lines, notices and the delivery record. */
 export function TempTag({ temp }: { temp: string }) {
-  return temp === "chilled" ? (
+  return requiresRefrigeration(temp) ? (
     <Pill tone="chilled" icon={Snowflake} size="sm">
-      Chilled
+      {TEMP_LABEL[temp]}
     </Pill>
   ) : (
     <Pill tone="neutral" icon={Package} size="sm">

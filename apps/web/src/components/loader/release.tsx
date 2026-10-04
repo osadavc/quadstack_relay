@@ -1,5 +1,6 @@
 "use client";
 
+import { lineName } from "@relay/domain";
 import {
   Check,
   CircleCheck,
@@ -47,7 +48,7 @@ type Reading =
   | { kind: "invalid"; message: string }
   | { kind: "ok"; value: number; inRange: boolean };
 
-function readTemp(raw: string): Reading {
+function readTemp(raw: string, chilledOnly: boolean): Reading {
   const text = raw.trim().replace(",", ".").replace("−", "-");
   if (!text) return { kind: "empty" };
   if (!/^-?\d{1,2}(\.\d?)?$/.test(text))
@@ -61,7 +62,7 @@ function readTemp(raw: string): Reading {
   return {
     kind: "ok",
     value,
-    inRange: value >= CHILLED_MIN && value <= CHILLED_MAX,
+    inRange: !chilledOnly || (value >= CHILLED_MIN && value <= CHILLED_MAX),
   };
 }
 
@@ -113,7 +114,8 @@ export function ReleaseScreen({ data }: { data: LoadSheetData }) {
   const left = data.totals.units - data.totals.done;
   const sealed = seal.trim().length > 0;
   const changeOk = !data.changeNote || data.changeAcked;
-  const reading = readTemp(tempText);
+  const hasFrozen = data.sections.some((s) => s.temp === "frozen");
+  const reading = readTemp(tempText, !hasFrozen);
   const tempOk = !data.reefer || reading.kind === "ok";
   const ready = left === 0 && sealed && changeOk && tempOk && !data.released;
   const driverFirst = data.hasDriver ? data.driverName.split(" ")[0] : null;
@@ -155,9 +157,11 @@ export function ReleaseScreen({ data }: { data: LoadSheetData }) {
     const sub =
       reading.kind === "invalid"
         ? reading.message
-        : reading.kind === "ok" && !reading.inRange
-          ? `Outside ${CHILLED_MIN}–${CHILLED_MAX} °C for chilled goods`
-          : `From the reefer display · ${CHILLED_MIN}–${CHILLED_MAX} °C for chilled goods`;
+        : hasFrozen
+          ? "Frozen goods on this load · confirm the required reefer set point"
+          : reading.kind === "ok" && !reading.inRange
+            ? `Outside ${CHILLED_MIN}–${CHILLED_MAX} °C for chilled goods`
+            : `From the reefer display · ${CHILLED_MIN}–${CHILLED_MAX} °C for chilled goods`;
     return (
       <CheckRow
         state={state}
@@ -241,7 +245,7 @@ export function ReleaseScreen({ data }: { data: LoadSheetData }) {
                 title={`${data.totals.units} of ${data.totals.units} orders loaded`}
                 sub={
                   deepest && firstStop
-                    ? `${deepest.outletId} deepest · ${firstStop.outletId} ${firstStop.temp === "chilled" ? "chilled goods" : "goods"} at the doors`
+                    ? `${deepest.outletId} deepest · ${firstStop.outletId} ${lineName(firstStop.temp).toLowerCase()} at the doors`
                     : undefined
                 }
               />

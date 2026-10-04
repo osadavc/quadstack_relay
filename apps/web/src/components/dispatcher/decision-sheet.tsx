@@ -99,12 +99,12 @@ export function DecisionSheet({
     choice.kind === "defer"
       ? {
           who: `${outlet?.name}’s store manager will see`,
-          text: `Your chilled order moves to ${d.nextRunLabel}. It’s protected and goes first. Anything else still arrives as planned.`,
+          text: `Your order moves to ${d.nextRunLabel}. It’s protected and goes first. Anything else still arrives as planned.`,
         }
       : chosenSwap
         ? {
             who: `${chosenSwap.with.name}’s store manager will see`,
-            text: `Your chilled order moves to ${d.nextRunLabel}, first fridge trip. ${outlet?.name} was skipped on the last run and takes your slot on ${d.dayLabel}.`,
+            text: `Your order moves to ${d.nextRunLabel}, first fridge trip. ${outlet?.name} was skipped on the last run and takes your slot on ${d.dayLabel}.`,
           }
         : chosenRedirect?.displacedNamed.length
           ? {
@@ -113,7 +113,7 @@ export function DecisionSheet({
             }
           : {
               who: `${outlet?.name}’s store manager will see`,
-              text: `Your chilled order for ${d.dayLabel} is back on the plan, with an arrival time.`,
+              text: `Your order for ${d.dayLabel} is back on the plan, with an arrival time.`,
             };
 
   return (

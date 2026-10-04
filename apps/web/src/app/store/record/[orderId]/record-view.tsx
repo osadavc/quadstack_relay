@@ -1,5 +1,7 @@
 "use client";
 
+import { TEMP_LABEL } from "@relay/domain";
+
 import {
   Check,
   CircleAlert,
@@ -74,7 +76,7 @@ export function RecordView({
   r: NonNullable<Awaited<ReturnType<typeof recordView>>>;
 }) {
   const temps = [...new Set(r.temps)]
-    .map((t) => (t === "chilled" ? "Chilled" : "dry"))
+    .map((t) => (t === "ambient" ? "dry" : TEMP_LABEL[t]))
     .join(" + ");
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { dayLabel } from "@relay/domain";
+import { dayLabel, requiresRefrigeration, TEMP_LABEL } from "@relay/domain";
 import { ChevronLeft, Package, Snowflake } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -167,7 +167,7 @@ export function PhoneOrder({
           {outlet.temps.map((temp) => (
             <section key={temp} className="flex flex-col gap-1.5">
               <p className="flex items-center gap-1.5 t-caption-m text-fg-3">
-                {temp === "chilled" ? (
+                {requiresRefrigeration(temp) ? (
                   <Snowflake
                     size={12}
                     strokeWidth={1.8}
@@ -177,7 +177,7 @@ export function PhoneOrder({
                 ) : (
                   <Package size={12} strokeWidth={1.8} aria-hidden />
                 )}
-                {temp === "chilled" ? "Chilled" : "Ambient"}
+                {TEMP_LABEL[temp]}
               </p>
               {productsFor(temp).length > 0 ? (
                 <ul className="divide-y divide-line rounded-[10px] border border-line">

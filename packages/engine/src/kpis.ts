@@ -1,6 +1,7 @@
 import type { Ctx } from "./schedule";
 import type { PlanState } from "./state";
 import type { EngineOrder, EngineVehicle, PlanKpis } from "./types";
+import { requiresRefrigeration } from "./types";
 
 const FRESH_CUTOFF = 8 * 60;
 
@@ -17,16 +18,16 @@ export function computeKpis(
   let totalPlanned = 0;
   for (const o of orders) {
     totalDemand += o.volumeM3;
-    if (o.temp === "chilled") chilledDemand += o.volumeM3;
+    if (requiresRefrigeration(o.temp)) chilledDemand += o.volumeM3;
     if (s.placed.has(o.id)) {
       totalPlanned += o.volumeM3;
-      if (o.temp === "chilled") chilledPlanned += o.volumeM3;
+      if (requiresRefrigeration(o.temp)) chilledPlanned += o.volumeM3;
     }
   }
 
   // Nearest district with chilled demand: the quickest extra trip a reefer could run.
   const chilledDistricts = new Set(
-    orders.filter((o) => o.temp === "chilled").map((o) => o.district),
+    orders.filter((o) => requiresRefrigeration(o.temp)).map((o) => o.district),
   );
   const nearest = Math.min(
     ...[...chilledDistricts].map((d) => ctx.travel.get(d)?.depotMin ?? 999),

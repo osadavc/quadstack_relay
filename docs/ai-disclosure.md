@@ -6,7 +6,7 @@ Relay uses no AI at run time. There are no language models, no machine-learning 
 
 ## In building it
 
-We used **Claude Code** (Anthropic, Claude Opus models) as a coding assistant throughout the Hackathon.
+We used **Claude Code** (Anthropic, Claude Opus models) as a coding assistant throughout the Hackathon. **OpenAI Codex** assisted with the operating-constraint audit, frozen-order support, depot-specific order closure, outdated-draft publishing checks and their regression tests and documentation. The seeded delivery-day work remains deferred.
 
 | Work | How AI was used | What we did |
 | --- | --- | --- |

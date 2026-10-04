@@ -25,7 +25,7 @@ export const productInput = z
       .max(40, "Keep the code under 40 characters"),
     name: z.string().trim().min(2, "Enter a name").max(80),
     brand: z.enum(["Fresh", "Style", "Tech"]),
-    temp: z.enum(["chilled", "ambient"]),
+    temp: z.enum(["chilled", "ambient", "frozen"]),
     unit: z.string().trim().min(1, "Say what one unit is").max(30),
     weightKg: z.number().positive("Weight per unit must be above 0").max(5000),
     volumeM3: z.number().positive("Volume per unit must be above 0").max(50),

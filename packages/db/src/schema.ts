@@ -51,7 +51,7 @@ export const roleEnum = pgEnum("role", [
   "store",
 ]);
 export const brandEnum = pgEnum("brand", ["Fresh", "Style", "Tech"]);
-export const tempEnum = pgEnum("temp", ["chilled", "ambient"]);
+export const tempEnum = pgEnum("temp", ["chilled", "ambient", "frozen"]);
 export const orderStatusEnum = pgEnum("order_status", [
   "draft",
   "confirmed",
@@ -337,6 +337,8 @@ export const plans = pgTable(
     kpis: jsonb("kpis").notNull(),
     bestCaseChilledM3: doublePrecision("best_case_chilled_m3"),
     stats: jsonb("stats").notNull(),
+    /** Hash of orders and operating constraints used to create this draft. */
+    inputHash: text("input_hash"),
     /** Manual edits since the engine ran, newest last. */
     edits: jsonb("edits")
       .$type<{ at: string; text: string }[]>()

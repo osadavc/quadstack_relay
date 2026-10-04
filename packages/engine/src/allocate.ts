@@ -20,6 +20,7 @@ import {
   type EngineVehicle,
   type PlanResult,
   type PolicyId,
+  requiresRefrigeration,
 } from "./types";
 
 /*
@@ -50,16 +51,17 @@ export const isProtected = (o: EngineOrder) =>
 export function orderValue(o: EngineOrder, policy: PolicyId): number {
   switch (policy) {
     case "fill":
-      return o.temp === "chilled" ? 10 + 3 * o.volumeM3 : 4 + 0.2 * o.volumeM3;
+      return requiresRefrigeration(o.temp)
+        ? 10 + 3 * o.volumeM3
+        : 4 + 0.2 * o.volumeM3;
     case "routes":
       return 8;
     default: {
-      const base =
-        o.temp === "chilled"
-          ? 10 + o.volumeM3
-          : o.brand === "Fresh"
-            ? 6 + 0.3 * o.volumeM3
-            : 5 + 0.2 * o.volumeM3;
+      const base = requiresRefrigeration(o.temp)
+        ? 10 + o.volumeM3
+        : o.brand === "Fresh"
+          ? 6 + 0.3 * o.volumeM3
+          : 5 + 0.2 * o.volumeM3;
       // Long gaps count for a little; repeated skips are the guard's job.
       return base + (o.daysSinceServed >= 3 ? 2 : 0);
     }
@@ -71,13 +73,20 @@ function priority(o: EngineOrder, policy: PolicyId, ctx: Ctx): number {
   const far = (ctx.travel.get(o.district)?.depotMin ?? 0) / 60;
   switch (policy) {
     case "fill":
-      return protect + (o.temp === "chilled" ? 60 : 0) + 4 * o.volumeM3;
+      return (
+        protect + (requiresRefrigeration(o.temp) ? 60 : 0) + 4 * o.volumeM3
+      );
     case "routes":
-      return protect + (o.temp === "chilled" ? 30 : 0) - 4 * far + o.volumeM3;
+      return (
+        protect +
+        (requiresRefrigeration(o.temp) ? 30 : 0) -
+        4 * far +
+        o.volumeM3
+      );
     default:
       return (
         protect +
-        (o.temp === "chilled" ? 40 : 0) +
+        (requiresRefrigeration(o.temp) ? 40 : 0) +
         (o.brand === "Fresh" ? 15 : 0) +
         (o.consecutiveSkips === 1 ? 6 : 0) +
         Math.min(o.daysSinceServed, 7) * 1.5 +
@@ -151,7 +160,7 @@ function allowed(
   if (v.temp === "reefer" && o.temp === "ambient" && !o.vanOnly) {
     if (!tripOrders) return false;
     return tripOrders.some(
-      (x) => x.outletId === o.outletId && x.temp === "chilled",
+      (x) => x.outletId === o.outletId && requiresRefrigeration(x.temp),
     );
   }
   return true;
@@ -319,7 +328,11 @@ export function plan(input: EngineInput): PlanResult {
       for (const id of waiting) {
         const x = orders.get(id);
         if (!x || x.brand !== o.brand || x.district !== o.district) continue;
-        if (v.temp === "reefer" ? x.temp === "chilled" : x.temp === "ambient")
+        if (
+          v.temp === "reefer"
+            ? requiresRefrigeration(x.temp)
+            : x.temp === "ambient"
+        )
           if (!x.vanOnly || v.type === "van") vol += x.volumeM3;
       }
       return vol;
